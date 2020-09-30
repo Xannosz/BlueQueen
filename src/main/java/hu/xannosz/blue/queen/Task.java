@@ -10,7 +10,7 @@ import java.util.Set;
 public class Task {
     private String id;
     private String image;
-    private boolean running;
+    private boolean shouldRunning;
     private Set<Douplet<Integer, Integer>> ports = new HashSet<>();
     private Set<Douplet<String, String>> volumes = new HashSet<>();
 
