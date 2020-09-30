@@ -9,4 +9,6 @@ public class Constants {
     public static final String EDIT_FORM = "editForm";
     public static final String DELETE = "delete";
     public static final String LOGS = "logs";
+
+    public static final String PERSIST_FOLDER = "/persist";
 }

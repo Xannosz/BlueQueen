@@ -1,16 +1,14 @@
 package hu.xannosz.blue.queen;
 
-import com.amihaiemil.docker.Container;
 import hu.xannosz.microtools.pack.Douplet;
 import hu.xannosz.veneos.core.HttpHandler;
 import hu.xannosz.veneos.core.Page;
 import hu.xannosz.veneos.core.VeneosServer;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static hu.xannosz.blue.queen.Constants.*;
-import static hu.xannosz.blue.queen.DockerHolder.getContainerFromName;
+import static hu.xannosz.blue.queen.DockerHolder.getContainerIdFromName;
 import static hu.xannosz.blue.queen.PageCreator.*;
 
 public class Queen implements HttpHandler {
@@ -22,61 +20,64 @@ public class Queen implements HttpHandler {
         VeneosServer server = new VeneosServer();
         server.createServer(8888);
         server.setHandler(this);
+        server.setLogger(LogHandlerImpl.INSTANCE);
 
         init();
     }
 
     private void init() {
-        DockerHolder.startAllTask(data.getTasks());
+        DockerHolder.stopAllTasks(data.getTasks());
+        DockerHolder.startAllTasks(data.getTasks());
     }
 
     @Override
     public Douplet<Integer, Page> getResponse(RequestMethod requestMethod, String s, Map<String, String> map) {
 
         String[] path = s.split("/");
-        String id = "";
+        String containerName = "";
         String method = "";
         if (path.length == 3) {
-            id = path[1];
+            containerName = path[1];
             method = path[2];
         }
 
-        Container container = getContainerFromName(id);
+        String containerId = getContainerIdFromName(containerName);
 
-
-        if (container != null) {
+        if (containerId != null) {
             if (method.equals(STOP)) {
-                try {
-                    container.stop();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                DockerHolder.stop(containerId);
+                for (Task task : data.getTasks()) {
+                    if (task.getId().equals(containerName)) {
+                        task.setShouldRunning(false);
+                    }
                 }
             }
             if (method.equals(START)) {
-                try {
-                    container.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                DockerHolder.start(containerId);
+                for (Task task : data.getTasks()) {
+                    if (task.getId().equals(containerName)) {
+                        task.setShouldRunning(true);
+                    }
                 }
             }
             if (method.equals(RESTART)) {
-                try {
-                    container.restart();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                DockerHolder.reStart(containerId);
             }
             if (method.equals(EDIT)) {
-                return createEdit(container);
+                for (Task task : data.getTasks()) {
+                    if (task.getId().equals(containerName)) {
+                        return createEdit(task);
+                    }
+                }
             }
             if (method.equals(LOGS)) {
-                return createLogs(container);
+                return createLogs(containerId, containerName);
             }
             if (method.equals(INSPECT)) {
-                return createInspect(container);
+                return createInspect(containerId, containerName);
             }
             if (method.equals(DELETE)) {
-                container.clear();
+                DockerHolder.delete(containerId);
             }
         }
 

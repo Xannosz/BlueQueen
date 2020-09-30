@@ -5,7 +5,7 @@
 	<artifactId>blue.queen</artifactId>
 	<version>0.0.1</version>
 	<name>blue.queen</name>
-	<description></description>
+	<description>Docker manager</description>
 	<organization>
 		<name>xannosz</name>
 	</organization>
@@ -60,9 +60,15 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.4</version>
+			<version>1.18.12</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>hu.xannosz</groupId>
@@ -70,24 +76,14 @@
 			<version>0.4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.amihaiemil.web</groupId>
-			<artifactId>docker-java-api</artifactId>
-			<version>0.0.13</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.json</groupId>
-			<artifactId>javax.json-api</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
 			<groupId>hu.xannosz</groupId>
 			<artifactId>veneos</artifactId>
 			<version>0.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.spotify</groupId>
+			<artifactId>docker-client</artifactId>
+			<version>8.16.0</version>
 		</dependency>
 	</dependencies>
 
