@@ -145,4 +145,38 @@ public class DockerHolder {
             }
         }
     }
+
+    public static String getValidName(String container, Set<Task> tasks) {
+        Container cont = getContainerFromId(container);
+        if (cont == null) {
+            return null;
+        }
+        return getValidName(cont, tasks);
+    }
+
+    public static String getValidName(Container container, Set<Task> tasks) {
+        if (container.names() == null) {
+            return container.id();
+        }
+        for (String cnt : Objects.requireNonNull(container.names())) {
+            for (Task task : tasks) {
+                if (("/" + task.getId()).equals(cnt)) {
+                    return task.getId();
+                }
+            }
+        }
+        if (Objects.requireNonNull(container.names()).size() > 0) {
+            return Objects.requireNonNull(container.names()).get(0).substring(1);
+        }
+        return container.id();
+    }
+
+    public static Container getContainerFromId(String container) {
+        for (Container cont : getContainers()) {
+            if (cont.id().equals(container)) {
+                return cont;
+            }
+        }
+        return null;
+    }
 }

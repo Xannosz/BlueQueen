@@ -73,12 +73,12 @@
 		<dependency>
 			<groupId>hu.xannosz</groupId>
 			<artifactId>microtools</artifactId>
-			<version>0.4.0</version>
+			<version>0.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>hu.xannosz</groupId>
 			<artifactId>veneos</artifactId>
-			<version>0.2.2</version>
+			<version>0.2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.spotify</groupId>

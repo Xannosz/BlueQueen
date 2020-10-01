@@ -5,10 +5,11 @@ import hu.xannosz.veneos.core.HttpHandler;
 import hu.xannosz.veneos.core.Page;
 import hu.xannosz.veneos.core.VeneosServer;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import static hu.xannosz.blue.queen.Constants.*;
-import static hu.xannosz.blue.queen.DockerHolder.getContainerIdFromName;
+import static hu.xannosz.blue.queen.DockerHolder.getValidName;
 import static hu.xannosz.blue.queen.PageCreator.*;
 
 public class Queen implements HttpHandler {
@@ -34,14 +35,14 @@ public class Queen implements HttpHandler {
     public Douplet<Integer, Page> getResponse(RequestMethod requestMethod, String s, Map<String, String> map) {
 
         String[] path = s.split("/");
-        String containerName = "";
+        String containerId = "";
         String method = "";
         if (path.length == 3) {
-            containerName = path[1];
+            containerId = path[1];
             method = path[2];
         }
 
-        String containerId = getContainerIdFromName(containerName);
+        String containerName = getValidName(containerId, data.getTasks());
 
         if (containerId != null) {
             if (method.equals(STOP)) {
@@ -51,6 +52,7 @@ public class Queen implements HttpHandler {
                         task.setShouldRunning(false);
                     }
                 }
+                return PageCreator.redirectPage();
             }
             if (method.equals(START)) {
                 DockerHolder.start(containerId);
@@ -59,9 +61,20 @@ public class Queen implements HttpHandler {
                         task.setShouldRunning(true);
                     }
                 }
+                return PageCreator.redirectPage();
             }
             if (method.equals(RESTART)) {
                 DockerHolder.reStart(containerId);
+                return PageCreator.redirectPage();
+            }
+            if (method.equals(RE_PULL)) {
+                for (Task task : data.getTasks()) {
+                    if (task.getId().equals(containerName)) {
+                        DockerHolder.delete(containerId);
+                        DockerHolder.startTask(task);
+                    }
+                }
+                return PageCreator.redirectPage();
             }
             if (method.equals(EDIT)) {
                 for (Task task : data.getTasks()) {
@@ -69,6 +82,19 @@ public class Queen implements HttpHandler {
                         return createEdit(task);
                     }
                 }
+                return PageCreator.redirectPage();
+            }
+            if (method.equals(EDIT_FORM)) {
+                for (Task task : data.getTasks()) {
+                    DockerHolder.delete(containerId);
+                    if (task.getId().equals(containerName)) {
+                        task.setId(map.get(ID));
+                        task.setImage(map.get(IMAGE));
+                        task.setShouldRunning(Boolean.parseBoolean(map.get(SHOULD_RUN)));
+                        DockerHolder.startTask(task);
+                    }
+                }
+                return PageCreator.redirectPage();
             }
             if (method.equals(LOGS)) {
                 return createLogs(containerId, containerName);
@@ -78,6 +104,12 @@ public class Queen implements HttpHandler {
             }
             if (method.equals(DELETE)) {
                 DockerHolder.delete(containerId);
+                for (Task task : new HashSet<>(data.getTasks())) {
+                    if (task.getId().equals(containerName)) {
+                        data.getTasks().remove(task);
+                    }
+                }
+                return PageCreator.redirectPage();
             }
         }
 
