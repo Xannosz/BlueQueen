@@ -119,6 +119,16 @@ public class DockerHolder {
         }
     }
 
+    public static boolean isManaged(Container container, Set<Task> tasks) {
+        String name = getValidName(container, tasks);
+        for (Task task : tasks) {
+            if (task.getId().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void delete(String id) {
         stop(id);
         try {

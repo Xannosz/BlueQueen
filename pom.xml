@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>hu.xannosz</groupId>
 			<artifactId>veneos</artifactId>
-			<version>0.2.4</version>
+			<version>0.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.spotify</groupId>
