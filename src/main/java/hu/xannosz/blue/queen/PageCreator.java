@@ -15,6 +15,7 @@ import hu.xannosz.veneos.core.html.*;
 import hu.xannosz.veneos.next.*;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.Set;
 
 import static hu.xannosz.blue.queen.Constants.*;
@@ -25,6 +26,7 @@ public class PageCreator {
 
     private static final Theme theme = new Theme();
     private static final HtmlClass oneButton = new HtmlClass();
+    private static final HtmlClass delete = new HtmlClass();
 
     private static final HtmlClass containerName = new HtmlClass();
     private static final HtmlClass label = new HtmlClass();
@@ -64,6 +66,10 @@ public class PageCreator {
         oneButInline.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
         oneButInline.addAttribute(CssAttribute.BORDER_COLOR, "#002b36");
         theme.add(oneButInline);
+
+        CssComponent deleteComp = new CssComponent(new Selector(new Selector(delete).getSyntax() + " " + HtmlSelector.BUTTON));
+        deleteComp.addAttribute(CssAttribute.BACKGROUND_COLOR, "#dc322f");
+        theme.add(deleteComp);
 
         CssComponent input = new CssComponent(HtmlSelector.INPUT.getSelector());
         input.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
@@ -108,7 +114,7 @@ public class PageCreator {
         ThemeHandler.registerTheme(theme);
     }
 
-    public static Douplet<Integer, Page> createInspect(String containerId, String containerName) {
+    public static Douplet<Integer, Page> createInspect(String containerId, String containerName, Map<String, String> dataMap) {
         Page page = new Page();
         page.addTheme(theme);
         page.setTitle("Blue Queen | " + containerName);
@@ -116,11 +122,13 @@ public class PageCreator {
         div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.inspectContainer(containerId))), 3, page));
         page.addComponent(div);
         page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).addClass(upButton));
-        page.addComponent(new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%")));
+        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
+        fixedButton.setDatas(dataMap);
+        page.addComponent(fixedButton);
         return new Douplet<>(200, page);
     }
 
-    public static Douplet<Integer, Page> createEdit(Task task) {
+    public static Douplet<Integer, Page> createEdit(Task task, Map<String, String> dataMap) {
         boolean newTask = task == null;
 
         Page page = new Page();
@@ -129,6 +137,7 @@ public class PageCreator {
         Div div = new Div();
 
         Form form = new Form("/" + (newTask ? "new" : DockerHolder.getContainerIdFromName(task.getId())) + "/" + EDIT_FORM);
+        form.setDatas(dataMap);
 
         form.add(new Label(ID, " task id: ").addClass(label));
         Input id = new Input("text");
@@ -156,6 +165,76 @@ public class PageCreator {
 
         form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
 
+        form.add(new Label("ports", "ports : ").addClass(label));
+        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(new Label("ports", "host............|").addClass(label));
+        form.add(new Label("ports", "|............docker").addClass(label));
+        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        int p = 0; //portNumber
+        if (!newTask) {
+            for (Douplet<Integer, Integer> port : task.getPorts()) {
+                Input inputH = new Input("text");
+                inputH.setName(PORT + "H" + p);
+                inputH.setValue("" + port.getFirst());
+                form.add(inputH);
+
+                Input inputD = new Input("text");
+                inputD.setName(PORT + "D" + p);
+                inputD.setValue("" + port.getSecond());
+                form.add(inputD);
+
+                form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+                p++;
+            }
+        }
+        for (int i = 0; i < 3; i++) {
+            Input inputH = new Input("text");
+            inputH.setName(PORT + "H" + p);
+            form.add(inputH);
+
+            Input inputD = new Input("text");
+            inputD.setName(PORT + "D" + p);
+            form.add(inputD);
+
+            form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+            p++;
+        }
+
+        form.add(new Label("volumes", "volumes : ").addClass(label));
+        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(new Label("volumes", "host............|").addClass(label));
+        form.add(new Label("volumes", "|............docker").addClass(label));
+        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        int v = 0; //volumeNumber
+        if (!newTask) {
+            for (Douplet<String, String> port : task.getVolumes()) {
+                Input inputH = new Input("text");
+                inputH.setName(VOLUME + "H" + v);
+                inputH.setValue("" + port.getFirst());
+                form.add(inputH);
+
+                Input inputD = new Input("text");
+                inputD.setName(VOLUME + "D" + v);
+                inputD.setValue("" + port.getSecond());
+                form.add(inputD);
+
+                form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+                v++;
+            }
+        }
+        for (int i = 0; i < 3; i++) {
+            Input inputH = new Input("text");
+            inputH.setName(VOLUME + "H" + v);
+            form.add(inputH);
+
+            Input inputD = new Input("text");
+            inputD.setName(VOLUME + "D" + v);
+            form.add(inputD);
+
+            form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+            v++;
+        }
+
         Button send = new Button("Ok");
         send.setSubmit();
         form.add(send);
@@ -169,7 +248,7 @@ public class PageCreator {
         return new Douplet<>(200, page);
     }
 
-    public static Douplet<Integer, Page> createLogs(String containerId, String containerName) {
+    public static Douplet<Integer, Page> createLogs(String containerId, String containerName, Map<String, String> dataMap) {
         Page page = new Page();
         page.addTheme(theme);
         page.setTitle("Blue Queen | " + containerName);
@@ -179,18 +258,19 @@ public class PageCreator {
         return new Douplet<>(200, page);
     }
 
-    public static Douplet<Integer, Page> redirectPage() {
+    public static Douplet<Integer, Page> redirectPage(Map<String, String> dataMap) {
         Page page = new Page();
         page.addTheme(theme);
-        page.addComponent(new Redirect("/"));
+        Redirect redirect = new Redirect("/");
+        redirect.setDatas(dataMap);
+        page.addComponent(redirect);
         return new Douplet<>(200, page);
     }
 
-    public static Douplet<Integer, Page> createList(Set<Task> tasks) {
+    public static Douplet<Integer, Page> createList(Set<Task> tasks, Map<String, String> dataMap) {
         Page page = new Page();
         page.addTheme(theme);
         page.setTitle("Blue Queen");
-        page.setAutoRefresh(5);
         for (Container container : Util.sortContainers(DockerHolder.getContainers())) {
             Div div = new Div();
             boolean isManaged = isManaged(container, tasks);
@@ -198,23 +278,24 @@ public class PageCreator {
             div.add(createInformationLine(getValidName(container, tasks), container.image()
                     , "" + container.state(), container.status(), isManaged));
             if ("running".equals(container.state())) {
-                div.add(new OneButtonForm("/" + container.id() + "/" + STOP, "Stop").addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + STOP, "Stop").setDatas(dataMap).addClass(oneButton));
             } else {
-                div.add(new OneButtonForm("/" + container.id() + "/" + START, "Start").addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + START, "Start").setDatas(dataMap).addClass(oneButton));
             }
-            div.add(new OneButtonForm("/" + container.id() + "/" + RESTART, "Restart").addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + RESTART, "Restart").setDatas(dataMap).addClass(oneButton));
             if (isManaged) {
-                div.add(new OneButtonForm("/" + container.id() + "/" + RE_PULL, "Re pull").addClass(oneButton));
-                div.add(new OneButtonForm("/" + container.id() + "/" + EDIT, "Edit").addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + RE_PULL, "Re pull").setDatas(dataMap).addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + EDIT, "Edit").setDatas(dataMap).addClass(oneButton));
             }
-            div.add(new OneButtonForm("/" + container.id() + "/" + LOGS, "Logs").addClass(oneButton));
-            div.add(new OneButtonForm("/" + container.id() + "/" + INSPECT, "Inspect").addClass(oneButton));
-            div.add(new OneButtonForm("/" + container.id() + "/" + DELETE, "Delete").addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + LOGS, "Logs").setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + INSPECT, "Inspect").setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + DELETE, "Delete").setDatas(dataMap).addClass(oneButton));
 
             page.addComponent(div);
         }
 
-        page.addComponent(new FixedButton("/new/edit","Add new docker",new ButtonPosition("10%","10%")));
+        page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
+       // page.addComponent(new Redirect("/", 30000).setDatas(dataMap));
 
         return new Douplet<>(200, page);
     }
@@ -244,5 +325,17 @@ public class PageCreator {
             builder.append(" ").append(new Span("NOT MANAGED").addClass(notManaged).getSyntax());
         }
         return new P(builder.toString());
+    }
+
+    public static Douplet<Integer, Page> createDelete(String containerId, String containerName, Map<String, String> dataMap) {
+        Page page = new Page();
+        page.addTheme(theme);
+        page.setTitle("Blue Queen | " + containerName);
+        Div div = new Div();
+        div.add(new P("Delete " + containerName + " ?"));
+        div.add(new OneButtonForm("/" + containerId + "/" + DELETE_OK, "Delete").setDatas(dataMap).addClass(oneButton).addClass(delete));
+        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
+        page.addComponent(div);
+        return new Douplet<>(200, page);
     }
 }

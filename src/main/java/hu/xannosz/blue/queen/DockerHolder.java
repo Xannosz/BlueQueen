@@ -1,5 +1,6 @@
 package hu.xannosz.blue.queen;
 
+import com.google.common.base.Strings;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
@@ -39,7 +40,9 @@ public class DockerHolder {
             final HostConfig.Builder hostConfigBuilder = HostConfig.builder();
 
             for (Douplet<String, String> volumePair : task.getVolumes()) {
-                hostConfigBuilder.appendBinds(PERSIST_FOLDER + "/" + task.getId() + "/" + volumePair.getFirst() + ":" + volumePair.getSecond());
+                if (!Strings.isNullOrEmpty(volumePair.getFirst()) && !Strings.isNullOrEmpty(volumePair.getSecond())) {
+                    hostConfigBuilder.appendBinds(PERSIST_FOLDER + "/" + task.getId() + "/" + volumePair.getFirst() + ":" + volumePair.getSecond());
+                }
             }
 
             final HostConfig hostConfig = hostConfigBuilder.portBindings(portBindings).build();

@@ -3,12 +3,15 @@ package hu.xannosz.blue.queen;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import hu.xannosz.microtools.Password;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Data {
@@ -17,6 +20,26 @@ public class Data {
 
     @Getter
     private final Set<Task> tasks = new HashSet<>();
+
+    @Getter
+    private final Map<String, String> userPassword = new HashMap<>();
+
+    public boolean addUserPassword(String user, String password) {
+        try {
+            userPassword.put(user, Password.getSaltedHash(password));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean authenticate(String user, String password) {
+        try {
+            return Password.check(password, userPassword.get(user));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public void addTask(Task task) {
         tasks.add(task);
