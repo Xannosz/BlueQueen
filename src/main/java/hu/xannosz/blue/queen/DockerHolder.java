@@ -44,9 +44,9 @@ public class DockerHolder {
 
             final HostConfig hostConfig = hostConfigBuilder.portBindings(portBindings).build();
 
-            docker.pull(task.getImage() + ":latest");
+            docker.pull(task.getImage().split(":")[0] + ":latest");
             final ContainerConfig containerConfig = ContainerConfig.builder().hostConfig(hostConfig).exposedPorts(extPorts)
-                    .image(task.getImage() + ":latest").build();
+                    .image(task.getImage().split(":")[0] + ":latest").build();
             final ContainerCreation creation = docker.createContainer(containerConfig);
             final String id = creation.id();
 

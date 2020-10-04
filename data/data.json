@@ -1,0 +1,1 @@
+{"tasks":[{"id":"sleep1","image":"sverrirab/sleep","shouldRunning":true,"ports":[],"volumes":[]},{"id":"started","image":"docker/getting-started","shouldRunning":false,"ports":[{"first":8008,"second":80}],"volumes":[]}]}

@@ -16,8 +16,8 @@ public class Queen implements HttpHandler {
 
     private final Data data;
 
-    public Queen(Data data) {
-        this.data = data;
+    public Queen() {
+        this.data = Data.readData();
         VeneosServer server = new VeneosServer();
         server.createServer(8888);
         server.setHandler(this);
@@ -77,6 +77,9 @@ public class Queen implements HttpHandler {
                 return PageCreator.redirectPage();
             }
             if (method.equals(EDIT)) {
+                if (containerId.equals("new")) {
+                    return createEdit(null);
+                }
                 for (Task task : data.getTasks()) {
                     if (task.getId().equals(containerName)) {
                         return createEdit(task);
@@ -85,6 +88,27 @@ public class Queen implements HttpHandler {
                 return PageCreator.redirectPage();
             }
             if (method.equals(EDIT_FORM)) {
+                if (containerId.equals("new")) {
+                    Task task = new Task();
+                    task.setId(map.get(ID));
+                    task.setImage(map.get(IMAGE));
+                    task.setShouldRunning(Boolean.parseBoolean(map.get(SHOULD_RUN)));
+
+                    String oldContainer = DockerHolder.getContainerIdFromName(map.get(ID));
+                    if (oldContainer != null) {
+                        DockerHolder.delete(oldContainer);
+                    }
+
+                    for (Task t : new HashSet<>(data.getTasks())) {
+                        if (t.getId().equals(task.getId())) {
+                            data.getTasks().remove(t);
+                        }
+                    }
+                    data.getTasks().add(task);
+
+                    DockerHolder.startTask(task);
+                    return PageCreator.redirectPage();
+                }
                 for (Task task : data.getTasks()) {
                     DockerHolder.delete(containerId);
                     if (task.getId().equals(containerName)) {
@@ -112,6 +136,8 @@ public class Queen implements HttpHandler {
                 return PageCreator.redirectPage();
             }
         }
+
+        data.writeData();
 
         return createList(data.getTasks());
     }
