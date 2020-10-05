@@ -71,6 +71,15 @@ public class PageCreator {
         deleteComp.addAttribute(CssAttribute.BACKGROUND_COLOR, "#dc322f");
         theme.add(deleteComp);
 
+        CssComponent buttonHover = new CssComponent(new Selector(HtmlSelector.BUTTON.toString()+":hover"));
+        buttonHover.addAttribute(CssAttribute.BACKGROUND_COLOR, "#002b36");
+        buttonHover.addAttribute(CssAttribute.BORDER_COLOR, "#073642");
+        theme.add(buttonHover);
+
+        CssComponent buttonClicked = new CssComponent(new Selector(HtmlSelector.BUTTON.toString()+":active"));
+        buttonClicked.addAttribute(CssAttribute.COLOR, "#6c71c4");
+        theme.add(buttonClicked);
+
         CssComponent input = new CssComponent(HtmlSelector.INPUT.getSelector());
         input.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
         input.addAttribute(CssAttribute.COLOR, "#268bd2");
@@ -241,7 +250,7 @@ public class PageCreator {
 
         div.add(form);
 
-        div.add(new OneButtonForm("/", "Cancel").addClass(oneButton));
+        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
 
         page.addComponent(div);
 
@@ -253,15 +262,20 @@ public class PageCreator {
         page.addTheme(theme);
         page.setTitle("Blue Queen | " + containerName);
         Div div = new Div();
+        //div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.inspectContainer(containerId))), 3, page)); //TODO
         div.add(new P(DockerHolder.getContainerLog(containerId)));
         page.addComponent(div);
+        page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).addClass(upButton));
+        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
+        fixedButton.setDatas(dataMap);
+        page.addComponent(fixedButton);
         return new Douplet<>(200, page);
     }
 
     public static Douplet<Integer, Page> redirectPage(Map<String, String> dataMap) {
         Page page = new Page();
         page.addTheme(theme);
-        Redirect redirect = new Redirect("/");
+        Redirect redirect = new Redirect("/", page);
         redirect.setDatas(dataMap);
         page.addComponent(redirect);
         return new Douplet<>(200, page);
@@ -295,8 +309,15 @@ public class PageCreator {
         }
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
-       // page.addComponent(new Redirect("/", 30000).setDatas(dataMap));
+        page.addComponent(new Redirect("/", 5000,page).setDatas(dataMap));
 
+        return new Douplet<>(200, page);
+    }
+
+    public static Douplet<Integer, Page> createLoginPage() {
+        Page page = new Login("/", "Log in", "user name :", "password :");
+        page.setTitle("Blue Queen");
+        page.addTheme(theme);
         return new Douplet<>(200, page);
     }
 

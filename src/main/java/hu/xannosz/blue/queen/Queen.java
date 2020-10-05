@@ -52,8 +52,7 @@ public class Queen implements HttpHandler {
         }
 
         if (token == null || !tokens.contains(token)) {
-            return new Douplet<>(200, new Login("/", "Log in", "user name :", "password :"));
-        } else {
+            return createLoginPage(); } else {
             dataMap.put(TOKEN, token);
         }
 
