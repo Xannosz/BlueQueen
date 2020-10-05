@@ -1,6 +1,7 @@
 package hu.xannosz.blue.queen;
 
 import com.google.common.base.Strings;
+import hu.xannosz.microtools.Password;
 import hu.xannosz.microtools.pack.Douplet;
 import hu.xannosz.veneos.core.HttpHandler;
 import hu.xannosz.veneos.core.Page;
@@ -52,7 +53,8 @@ public class Queen implements HttpHandler {
         }
 
         if (token == null || !tokens.contains(token)) {
-            return createLoginPage(); } else {
+            return createLoginPage();
+        } else {
             dataMap.put(TOKEN, token);
         }
 
@@ -203,5 +205,9 @@ public class Queen implements HttpHandler {
             }
         }
         return task;
+    }
+
+    public static void main(String[] args) {
+        Queen queen = new Queen();
     }
 }

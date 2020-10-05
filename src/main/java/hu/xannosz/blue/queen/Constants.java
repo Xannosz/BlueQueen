@@ -11,7 +11,6 @@ public class Constants {
     public static final String DELETE = "delete";
     public static final String DELETE_OK = "deleteOK";
     public static final String LOGS = "logs";
-    public static final String LOGIN = "login";
 
     public static final String PERSIST_FOLDER = "/persist";
 

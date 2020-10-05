@@ -6,7 +6,10 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
 import hu.xannosz.microtools.pack.Douplet;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static hu.xannosz.blue.queen.Constants.PERSIST_FOLDER;
@@ -82,8 +85,11 @@ public class DockerHolder {
 
     public static String getContainerLog(String containerId) {
         try {
-            return docker.inspectContainer(containerId).logPath();
-        } catch (InterruptedException | DockerException e) {
+            File file = new File(docker.inspectContainer(containerId).logPath());
+            if (file.exists() && file.isFile()) {
+                return FileUtils.readFileToString(file);
+            }
+        } catch (InterruptedException | DockerException | IOException e) {
             LogHandlerImpl.INSTANCE.error(String.format("Inspect container %s failed.", containerId), e);
         }
         return "";
