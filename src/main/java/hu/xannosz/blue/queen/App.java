@@ -5,6 +5,6 @@ import hu.xannosz.microtools.Password;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("##:"+ Password.getSaltedHash("password"));
+        System.out.println("##:"+ Password.getSaltedHash("142753869"));
     }
 }

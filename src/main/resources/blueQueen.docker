@@ -1,3 +1,0 @@
-FROM lwieske/java-8:latest
-COPY ./blueQueen /blueQueen
-CMD cd blueQueen && java blueQueen.jar

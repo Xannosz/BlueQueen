@@ -44,6 +44,9 @@ public class Queen implements HttpHandler {
         Map<String, String> dataMap = new HashMap<>();
 
         if (user != null && password != null) {
+            if(data.getUserPassword().isEmpty()){
+                data.addUserPassword(user,password);
+            }
             if (data.authenticate(user, password)) {
                 token = "token" + createToken().replace("-", "");
                 tokens.add(token);

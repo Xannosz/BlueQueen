@@ -19,7 +19,8 @@ public class DockerHolder {
     private static DockerClient docker;
 
     public static void init() {
-        docker = DefaultDockerClient.builder().uri("http://localhost:2375").build();
+        docker = DefaultDockerClient.builder().uri("http://host.docker.internal:2375").build();
+        //docker = DefaultDockerClient.builder().uri("http://localhost:2375").build();
     }
 
     public static void startAllTasks(Set<Task> tasks) {
@@ -89,6 +90,7 @@ public class DockerHolder {
             if (file.exists() && file.isFile()) {
                 return FileUtils.readFileToString(file);
             }
+            return docker.inspectContainer(containerId).logPath();
         } catch (InterruptedException | DockerException | IOException e) {
             LogHandlerImpl.INSTANCE.error(String.format("Inspect container %s failed.", containerId), e);
         }

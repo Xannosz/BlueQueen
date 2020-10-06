@@ -71,12 +71,12 @@ public class PageCreator {
         deleteComp.addAttribute(CssAttribute.BACKGROUND_COLOR, "#dc322f");
         theme.add(deleteComp);
 
-        CssComponent buttonHover = new CssComponent(new Selector(HtmlSelector.BUTTON.toString()+":hover"));
+        CssComponent buttonHover = new CssComponent(new Selector(HtmlSelector.BUTTON.toString() + ":hover"));
         buttonHover.addAttribute(CssAttribute.BACKGROUND_COLOR, "#002b36");
         buttonHover.addAttribute(CssAttribute.BORDER_COLOR, "#073642");
         theme.add(buttonHover);
 
-        CssComponent buttonClicked = new CssComponent(new Selector(HtmlSelector.BUTTON.toString()+":active"));
+        CssComponent buttonClicked = new CssComponent(new Selector(HtmlSelector.BUTTON.toString() + ":active"));
         buttonClicked.addAttribute(CssAttribute.COLOR, "#6c71c4");
         theme.add(buttonClicked);
 
@@ -130,7 +130,7 @@ public class PageCreator {
         Div div = new Div();
         div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.inspectContainer(containerId))), 3, page));
         page.addComponent(div);
-        page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).addClass(upButton));
+        page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).setDatas(dataMap).addClass(upButton));
         FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
         fixedButton.setDatas(dataMap);
         page.addComponent(fixedButton);
@@ -262,10 +262,13 @@ public class PageCreator {
         page.addTheme(theme);
         page.setTitle("Blue Queen | " + containerName);
         Div div = new Div();
-        //div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.inspectContainer(containerId))), 3, page)); //TODO
-        div.add(new P(DockerHolder.getContainerLog(containerId)));
+        try {
+            div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.getContainerLog(containerId))), 3, page));
+        } catch (Exception e) {
+            div.add(new P(DockerHolder.getContainerLog(containerId)));
+        }
         page.addComponent(div);
-        page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).addClass(upButton));
+        page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).setDatas(dataMap).addClass(upButton));
         FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
         fixedButton.setDatas(dataMap);
         page.addComponent(fixedButton);
@@ -309,7 +312,7 @@ public class PageCreator {
         }
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
-        page.addComponent(new Redirect("/", 5000,page).setDatas(dataMap));
+        page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
 
         return new Douplet<>(200, page);
     }
