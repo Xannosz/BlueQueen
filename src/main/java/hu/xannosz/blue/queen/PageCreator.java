@@ -263,7 +263,7 @@ public class PageCreator {
         page.setTitle("Blue Queen | " + containerName);
         Div div = new Div();
         try {
-            div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.getContainerLog(containerId))), 3, page));
+            div.add(new JsonDisplay(new JSONObject(DockerHolder.getContainerLog(containerId)), 3, page));
         } catch (Exception e) {
             div.add(new P(DockerHolder.getContainerLog(containerId)));
         }

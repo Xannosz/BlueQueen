@@ -14,9 +14,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static hu.xannosz.blue.queen.Constants.PERSIST_FOLDER;
+
 public class Data {
 
-    private final static Path DATA_PATH = Paths.get("data/data.json");
+    private final static Path DATA_PATH = Paths.get(PERSIST_FOLDER, "bluequeen/data/data.json");
 
     @Getter
     private final Set<Task> tasks = new HashSet<>();

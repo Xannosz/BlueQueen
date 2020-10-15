@@ -1,12 +1,10 @@
 package hu.xannosz.blue.queen;
 
 import com.google.common.base.Strings;
-import hu.xannosz.microtools.Password;
 import hu.xannosz.microtools.pack.Douplet;
 import hu.xannosz.veneos.core.HttpHandler;
 import hu.xannosz.veneos.core.Page;
 import hu.xannosz.veneos.core.VeneosServer;
-import hu.xannosz.veneos.next.Login;
 
 import java.util.*;
 
@@ -44,8 +42,8 @@ public class Queen implements HttpHandler {
         Map<String, String> dataMap = new HashMap<>();
 
         if (user != null && password != null) {
-            if(data.getUserPassword().isEmpty()){
-                data.addUserPassword(user,password);
+            if (data.getUserPassword().isEmpty()) {
+                data.addUserPassword(user, password);
             }
             if (data.authenticate(user, password)) {
                 token = "token" + createToken().replace("-", "");
