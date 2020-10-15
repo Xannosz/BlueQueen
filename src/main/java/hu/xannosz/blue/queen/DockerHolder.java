@@ -19,7 +19,7 @@ public class DockerHolder {
     private static DockerClient docker;
 
     public static void init() {
-        docker = DefaultDockerClient.builder().uri("http://host.docker.internal:2375").build();
+        docker = DefaultDockerClient.builder().uri("unix:///var/run/docker.sock").build();
         //docker = DefaultDockerClient.builder().uri("http://localhost:2375").build();
     }
 
