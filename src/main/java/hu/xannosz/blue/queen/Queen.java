@@ -177,14 +177,14 @@ public class Queen implements HttpHandler {
 
     private Task createTask(Map<String, String> map) {
         Task task = new Task();
-        task.setId(map.get(ID));
-        task.setImage(map.get(IMAGE));
+        task.setId(map.get(ID).trim());
+        task.setImage(map.get(IMAGE).trim());
         task.setShouldRunning(Boolean.parseBoolean(map.get(SHOULD_RUN)));
         for (int i = 0; i < map.size(); i++) {
             try {
-                int portH = Integer.parseInt(map.get(PORT + "H" + i));
+                int portH = Integer.parseInt(map.get(PORT + "H" + i).trim());
                 if (portH != 0) {
-                    int portD = Integer.parseInt(map.get(PORT + "D" + i));
+                    int portD = Integer.parseInt(map.get(PORT + "D" + i).trim());
                     if (portD != 0) {
                         task.addPort(portH, portD);
                     }
@@ -194,9 +194,9 @@ public class Queen implements HttpHandler {
             }
 
             try {
-                String volumeH = map.get(VOLUME + "H" + i);
+                String volumeH = map.get(VOLUME + "H" + i).trim();
                 if (!Strings.isNullOrEmpty(volumeH)) {
-                    String volumeD = map.get(VOLUME + "D" + i);
+                    String volumeD = map.get(VOLUME + "D" + i).trim();
                     if (!Strings.isNullOrEmpty(volumeD)) {
                         task.addVolume(volumeH, volumeD);
                     }

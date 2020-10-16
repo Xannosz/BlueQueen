@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static hu.xannosz.blue.queen.Constants.PERSIST_FOLDER;
@@ -45,7 +46,7 @@ public class DockerHolder {
 
             for (Douplet<String, String> volumePair : task.getVolumes()) {
                 if (!Strings.isNullOrEmpty(volumePair.getFirst()) && !Strings.isNullOrEmpty(volumePair.getSecond())) {
-                    hostConfigBuilder.appendBinds(PERSIST_FOLDER + "/" + task.getId() + "/" + volumePair.getFirst() + ":" + volumePair.getSecond());
+                    hostConfigBuilder.appendBinds(Paths.get(PERSIST_FOLDER, task.getId().trim(), volumePair.getFirst().trim()) + ":" + volumePair.getSecond().trim());
                 }
             }
 
@@ -57,7 +58,7 @@ public class DockerHolder {
             final ContainerCreation creation = docker.createContainer(containerConfig);
             final String id = creation.id();
 
-            docker.renameContainer(id, task.getId());
+            docker.renameContainer(id, task.getId().trim());
             if (task.isShouldRunning()) {
                 docker.startContainer(id);
             }
