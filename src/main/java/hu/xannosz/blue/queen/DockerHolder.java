@@ -46,15 +46,21 @@ public class DockerHolder {
 
             for (Douplet<String, String> volumePair : task.getVolumes()) {
                 if (!Strings.isNullOrEmpty(volumePair.getFirst()) && !Strings.isNullOrEmpty(volumePair.getSecond())) {
-                    hostConfigBuilder.appendBinds(Paths.get(PERSIST_FOLDER, task.getId().trim(), volumePair.getFirst().trim()) + ":" + volumePair.getSecond().trim());
+                    hostConfigBuilder.appendBinds(Paths.get(PERSIST_FOLDER, volumePair.getFirst().trim()) + ":" + volumePair.getSecond().trim());
                 }
             }
 
             final HostConfig hostConfig = hostConfigBuilder.portBindings(portBindings).build();
 
-            docker.pull(task.getImage().split(":")[0] + ":latest");
+            String image = task.getImage();
+            if (!image.contains(":")) {
+                image += ":latest";
+            }
+            task.setImage(image);
+
+            docker.pull(image);
             final ContainerConfig containerConfig = ContainerConfig.builder().hostConfig(hostConfig).exposedPorts(extPorts)
-                    .image(task.getImage().split(":")[0] + ":latest").build();
+                    .image(image).build();
             final ContainerCreation creation = docker.createContainer(containerConfig);
             final String id = creation.id();
 

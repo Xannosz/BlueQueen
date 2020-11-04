@@ -15,6 +15,7 @@ import hu.xannosz.veneos.core.html.*;
 import hu.xannosz.veneos.next.*;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,6 +120,14 @@ public class PageCreator {
         CssComponent body = new CssComponent(HtmlSelector.BODY);
         body.addAttribute(CssAttribute.BACKGROUND_COLOR, "#002b36");
         theme.add(body);
+
+        CssComponent footer = new CssComponent(HtmlSelector.FOOTER);
+        footer.addAttribute(CssAttribute.COLOR, "#268bd2");
+        footer.addAttribute(CssAttribute.PADDING, "10px 20px 15px 20px");
+        footer.addAttribute(CssAttribute.MARGIN, "2%");
+        footer.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
+        footer.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
+        theme.add(footer);
 
         ThemeHandler.registerTheme(theme);
     }
@@ -284,7 +293,7 @@ public class PageCreator {
         return new Douplet<>(200, page);
     }
 
-    public static Douplet<Integer, Page> createList(Set<Task> tasks, Map<String, String> dataMap) {
+    public static Douplet<Integer, Page> createList(Set<Task> tasks, Map<String, String> dataMap, Date reStartDate) {
         Page page = new Page();
         page.addTheme(theme);
         page.setTitle("Blue Queen");
@@ -313,6 +322,7 @@ public class PageCreator {
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
         page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
+        page.addComponent((new Footer()).add(new StringHtmlComponent("Restart date: " + reStartDate)));
 
         return new Douplet<>(200, page);
     }

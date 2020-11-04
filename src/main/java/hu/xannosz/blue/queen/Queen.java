@@ -14,17 +14,18 @@ import static hu.xannosz.blue.queen.PageCreator.*;
 
 public class Queen implements HttpHandler {
 
-    private final Data data;
+    private Data data;
     private final Set<String> tokens = new HashSet<>();
 
     public Queen() {
         DockerHolder.init();
-        this.data = Data.readData();
+        data = Data.readData();
         VeneosServer server = new VeneosServer();
         server.createServer(8888);
         server.setHandler(this);
         server.setLogger(LogHandlerImpl.INSTANCE);
 
+        startTimer();
         init();
     }
 
@@ -35,6 +36,8 @@ public class Queen implements HttpHandler {
 
     @Override
     public Douplet<Integer, Page> getResponse(RequestMethod requestMethod, String s, Map<String, String> map) {
+
+        data = Data.readData();
 
         String token = null;
         String user = map.get(USER);
@@ -164,7 +167,7 @@ public class Queen implements HttpHandler {
 
         data.writeData();
 
-        return createList(data.getTasks(), dataMap);
+        return createList(data.getTasks(), dataMap, data.getNextReStartDate());
     }
 
     private String createToken() {
@@ -206,6 +209,10 @@ public class Queen implements HttpHandler {
             }
         }
         return task;
+    }
+
+    private void startTimer() {
+        new TimerThread().start();
     }
 
     public static void main(String[] args) {
