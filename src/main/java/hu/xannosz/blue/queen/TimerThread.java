@@ -6,21 +6,19 @@ import java.util.Date;
 
 public class TimerThread extends Thread {
 
-    private Data data = Data.readData();
-
     @Override
     public void run() {
         Sleep.sleepSeconds(30);
-        while (data.getNextReStartDate().after(new Date())) {
-            data = Data.readData();
-            Sleep.sleepMillis(data.getCheckingDelay());
+        while (Data.INSTANCE.getNextReStartDate().after(new Date())) {
+            Data.readData();
+            Sleep.sleepMillis(Data.INSTANCE.getCheckingDelay());
         }
         reStart();
     }
 
     private void reStart() {
-        data.getNextReStartDate().setTime(data.getNextReStartDate().getTime() + data.getTimeToRestart());
-        data.writeData();
-        DockerHolder.reStart(DockerHolder.getContainerIdFromName(data.getSelfName()));
+        Data.INSTANCE.getNextReStartDate().setTime(Data.INSTANCE.getNextReStartDate().getTime() + Data.INSTANCE.getTimeToRestart());
+        Data.writeData();
+        DockerHolder.reStart(DockerHolder.getContainerIdFromName(Data.INSTANCE.getSelfName()));
     }
 }

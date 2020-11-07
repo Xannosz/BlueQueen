@@ -322,7 +322,8 @@ public class PageCreator {
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
         page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
-        page.addComponent((new Footer()).add(new StringHtmlComponent("Restart date: " + reStartDate)));
+        page.addComponent((new Footer()).add(new StringHtmlComponent("Restart date: " + reStartDate))
+                .add(new StringHtmlComponent(StringModifiers.BR + "Blue Queen version: " + Util.VERSION)));
 
         return new Douplet<>(200, page);
     }

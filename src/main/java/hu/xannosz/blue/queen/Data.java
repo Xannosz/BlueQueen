@@ -17,6 +17,8 @@ public class Data {
 
     private final static Path DATA_PATH = Paths.get(PERSIST_FOLDER, "bluequeen/data/data.json");
 
+    public static Data INSTANCE = new Data();
+
     @Getter
     private final Set<Task> tasks = new HashSet<>();
 
@@ -34,6 +36,10 @@ public class Data {
 
     @Getter
     private final Map<String, String> userPassword = new HashMap<>();
+
+    private Data(){
+
+    }
 
     public boolean addUserPassword(String user, String password) {
         try {
@@ -56,21 +62,21 @@ public class Data {
         tasks.add(task);
     }
 
-    public static Data readData() {
+    public static void readData() {
         try {
             JsonElement dataObject = JsonParser.parseString(FileUtils.readFileToString(DATA_PATH.toFile()));
-            return new Gson().fromJson(dataObject, Data.class);
+            INSTANCE = new Gson().fromJson(dataObject, Data.class);
         } catch (Exception e) {
             e.printStackTrace();
-            return new Data();
+            INSTANCE =  new Data();
         }
     }
 
-    public void writeData() {
+    public static void writeData() {
         try {
             DATA_PATH.toFile().getParentFile().mkdirs();
             DATA_PATH.toFile().createNewFile();
-            FileUtils.writeStringToFile(DATA_PATH.toFile(), new Gson().toJson(this));
+            FileUtils.writeStringToFile(DATA_PATH.toFile(), new Gson().toJson(INSTANCE));
         } catch (Exception e) {
             LogHandlerImpl.INSTANCE.error(String.format("Write data to %s failed.", DATA_PATH), e);
         }

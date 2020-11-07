@@ -14,12 +14,11 @@ import static hu.xannosz.blue.queen.PageCreator.*;
 
 public class Queen implements HttpHandler {
 
-    private Data data;
     private final Set<String> tokens = new HashSet<>();
 
     public Queen() {
         DockerHolder.init();
-        data = Data.readData();
+        Data.readData();
         VeneosServer server = new VeneosServer();
         server.createServer(8888);
         server.setHandler(this);
@@ -30,14 +29,14 @@ public class Queen implements HttpHandler {
     }
 
     private void init() {
-        DockerHolder.stopAllTasks(data.getTasks());
-        DockerHolder.startAllTasks(data.getTasks());
+        DockerHolder.stopAllTasks(Data.INSTANCE.getTasks());
+        DockerHolder.startAllTasks(Data.INSTANCE.getTasks());
     }
 
     @Override
     public Douplet<Integer, Page> getResponse(RequestMethod requestMethod, String s, Map<String, String> map) {
 
-        data = Data.readData();
+        Data.readData();
 
         String token = null;
         String user = map.get(USER);
@@ -45,10 +44,10 @@ public class Queen implements HttpHandler {
         Map<String, String> dataMap = new HashMap<>();
 
         if (user != null && password != null) {
-            if (data.getUserPassword().isEmpty()) {
-                data.addUserPassword(user, password);
+            if (Data.INSTANCE.getUserPassword().isEmpty()) {
+                Data.INSTANCE.addUserPassword(user, password);
             }
-            if (data.authenticate(user, password)) {
+            if (Data.INSTANCE.authenticate(user, password)) {
                 token = "token" + createToken().replace("-", "");
                 tokens.add(token);
             }
@@ -70,12 +69,12 @@ public class Queen implements HttpHandler {
             method = path[2];
         }
 
-        String containerName = getValidName(containerId, data.getTasks());
+        String containerName = getValidName(containerId, Data.INSTANCE.getTasks());
 
         if (containerId != null) {
             if (method.equals(STOP)) {
                 DockerHolder.stop(containerId);
-                for (Task task : data.getTasks()) {
+                for (Task task : Data.INSTANCE.getTasks()) {
                     if (task.getId().equals(containerName)) {
                         task.setShouldRunning(false);
                     }
@@ -84,7 +83,7 @@ public class Queen implements HttpHandler {
             }
             if (method.equals(START)) {
                 DockerHolder.start(containerId);
-                for (Task task : data.getTasks()) {
+                for (Task task : Data.INSTANCE.getTasks()) {
                     if (task.getId().equals(containerName)) {
                         task.setShouldRunning(true);
                     }
@@ -96,7 +95,7 @@ public class Queen implements HttpHandler {
                 return PageCreator.redirectPage(dataMap);
             }
             if (method.equals(RE_PULL)) {
-                for (Task task : data.getTasks()) {
+                for (Task task : Data.INSTANCE.getTasks()) {
                     if (task.getId().equals(containerName)) {
                         DockerHolder.delete(containerId);
                         DockerHolder.startTask(task);
@@ -108,7 +107,7 @@ public class Queen implements HttpHandler {
                 if (containerId.equals("new")) {
                     return createEdit(null, dataMap);
                 }
-                for (Task task : data.getTasks()) {
+                for (Task task : Data.INSTANCE.getTasks()) {
                     if (task.getId().equals(containerName)) {
                         return createEdit(task, dataMap);
                     }
@@ -124,22 +123,22 @@ public class Queen implements HttpHandler {
                         DockerHolder.delete(oldContainer);
                     }
 
-                    for (Task t : new HashSet<>(data.getTasks())) {
+                    for (Task t : new HashSet<>(Data.INSTANCE.getTasks())) {
                         if (t.getId().equals(task.getId())) {
-                            data.getTasks().remove(t);
+                            Data.INSTANCE.getTasks().remove(t);
                         }
                     }
-                    data.getTasks().add(task);
+                    Data.INSTANCE.getTasks().add(task);
 
                     DockerHolder.startTask(task);
                     return PageCreator.redirectPage(dataMap);
                 }
-                for (Task task : new HashSet<>(data.getTasks())) {
+                for (Task task : new HashSet<>(Data.INSTANCE.getTasks())) {
                     if (task.getId().equals(containerName)) {
                         DockerHolder.delete(containerId);
-                        data.getTasks().remove(task);
+                        Data.INSTANCE.getTasks().remove(task);
                         Task newTask = createTask(map);
-                        data.getTasks().add(newTask);
+                        Data.INSTANCE.getTasks().add(newTask);
                         DockerHolder.startTask(newTask);
                     }
                 }
@@ -156,18 +155,18 @@ public class Queen implements HttpHandler {
             }
             if (method.equals(DELETE_OK)) {
                 DockerHolder.delete(containerId);
-                for (Task task : new HashSet<>(data.getTasks())) {
+                for (Task task : new HashSet<>(Data.INSTANCE.getTasks())) {
                     if (task.getId().equals(containerName)) {
-                        data.getTasks().remove(task);
+                        Data.INSTANCE.getTasks().remove(task);
                     }
                 }
                 return PageCreator.redirectPage(dataMap);
             }
         }
 
-        data.writeData();
+        Data.writeData();
 
-        return createList(data.getTasks(), dataMap, data.getNextReStartDate());
+        return createList(Data.INSTANCE.getTasks(), dataMap, Data.INSTANCE.getNextReStartDate());
     }
 
     private String createToken() {
