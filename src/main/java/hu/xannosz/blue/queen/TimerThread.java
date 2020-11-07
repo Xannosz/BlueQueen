@@ -10,7 +10,6 @@ public class TimerThread extends Thread {
     public void run() {
         Sleep.sleepSeconds(30);
         while (Data.INSTANCE.getNextReStartDate().after(new Date())) {
-            Data.readData();
             Sleep.sleepMillis(Data.INSTANCE.getCheckingDelay());
         }
         reStart();

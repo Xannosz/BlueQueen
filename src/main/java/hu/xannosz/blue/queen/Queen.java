@@ -36,8 +36,6 @@ public class Queen implements HttpHandler {
     @Override
     public Douplet<Integer, Page> getResponse(RequestMethod requestMethod, String s, Map<String, String> map) {
 
-        Data.readData();
-
         String token = null;
         String user = map.get(USER);
         String password = map.get(PASSWD);
