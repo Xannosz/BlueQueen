@@ -67,6 +67,10 @@ public class Queen implements HttpHandler {
             method = path[2];
         }
 
+        if (path.length == 2) {
+            method = path[1];
+        }
+
         String containerName = getValidName(containerId, Data.INSTANCE.getTasks());
 
         if (containerId != null) {
@@ -162,9 +166,24 @@ public class Queen implements HttpHandler {
             }
         }
 
+        if (method.equals(SETTINGS)) {
+            return PageCreator.createSettings(dataMap);
+        }
+        if (method.equals(SETTINGS_OK)) {
+            try {
+                Data.INSTANCE.setCheckingDelay(Integer.parseInt(map.get(CHECKING_DELAY)));
+                Data.INSTANCE.setNextRestartDate(new Date(map.get(NEXT_RESTART_DATE)));
+                Data.INSTANCE.setTimeToRestart(Integer.parseInt(map.get(TIME_TO_RESTART)));
+                Data.writeData();
+            } catch (Exception e) {
+                //No problem
+            }
+            return PageCreator.redirectPage(dataMap);
+        }
+
         Data.writeData();
 
-        return createList(Data.INSTANCE.getTasks(), dataMap, Data.INSTANCE.getNextReStartDate());
+        return createList(Data.INSTANCE.getTasks(), dataMap, Data.INSTANCE.getNextRestartDate());
     }
 
     private String createToken() {

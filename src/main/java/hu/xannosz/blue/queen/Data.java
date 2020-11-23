@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import hu.xannosz.microtools.Password;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
@@ -23,13 +24,16 @@ public class Data {
     private final Set<Task> tasks = new HashSet<>();
 
     @Getter
-    private final Date nextReStartDate = new Date();
+    @Setter
+    private Date nextRestartDate = new Date();
 
     @Getter
-    private final long timeToRestart = 1000 * 60 * 5;
+    @Setter
+    private long timeToRestart = 1000 * 60 * 5;
 
     @Getter
-    private final int checkingDelay = 1000 * 10;
+    @Setter
+    private int checkingDelay = 1000 * 10;
 
     @Getter
     private final String selfName = "bluequeen";
@@ -37,7 +41,7 @@ public class Data {
     @Getter
     private final Map<String, String> userPassword = new HashMap<>();
 
-    private Data(){
+    private Data() {
 
     }
 
@@ -68,7 +72,7 @@ public class Data {
             INSTANCE = new Gson().fromJson(dataObject, Data.class);
         } catch (Exception e) {
             e.printStackTrace();
-            INSTANCE =  new Data();
+            INSTANCE = new Data();
         }
     }
 

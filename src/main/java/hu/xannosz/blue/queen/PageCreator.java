@@ -321,6 +321,8 @@ public class PageCreator {
         }
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
+        page.addComponent(new FixedButton("/"+SETTINGS, "Settings", new ButtonPosition("10%", "20%")).setDatas(dataMap));
+
         page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
         page.addComponent((new Footer()).add(new StringHtmlComponent("Restart date: " + reStartDate))
                 .add(new StringHtmlComponent(StringModifiers.BR + "Blue Queen version: " + Util.VERSION)));
@@ -371,6 +373,48 @@ public class PageCreator {
         div.add(new OneButtonForm("/" + containerId + "/" + DELETE_OK, "Delete").setDatas(dataMap).addClass(oneButton).addClass(delete));
         div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
         page.addComponent(div);
+        return new Douplet<>(200, page);
+    }
+
+    public static Douplet<Integer, Page> createSettings(Map<String, String> dataMap) {
+        Page page = new Page();
+        page.addTheme(theme);
+        page.setTitle("Blue Queen | Settings");
+        Div div = new Div();
+
+        Form form = new Form("/" + SETTINGS_OK);
+        form.setDatas(dataMap);
+
+        form.add(new Label(NEXT_RESTART_DATE, " next restart date (date) : ").addClass(label));
+        Input nextRestartDate = new Input("text");
+        nextRestartDate.setName(NEXT_RESTART_DATE);
+        nextRestartDate.setValue("" + Data.INSTANCE.getNextRestartDate());
+        form.add(nextRestartDate);
+
+        form.add(new Label(TIME_TO_RESTART, " time to restart (integer) : ").addClass(label));
+        Input timeToRestart = new Input("text");
+        timeToRestart.setName(TIME_TO_RESTART);
+        timeToRestart.setValue("" + Data.INSTANCE.getTimeToRestart());
+        form.add(timeToRestart);
+
+        form.add(new Label(CHECKING_DELAY, " checking delay (integer) : ").addClass(label));
+        Input checkingDelay = new Input("text");
+        checkingDelay.setName(CHECKING_DELAY);
+        checkingDelay.setValue("" + Data.INSTANCE.getCheckingDelay());
+        form.add(checkingDelay);
+
+        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+
+        Button send = new Button("Ok");
+        send.setSubmit();
+        form.add(send);
+
+        div.add(form);
+
+        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
+
+        page.addComponent(div);
+
         return new Douplet<>(200, page);
     }
 }
