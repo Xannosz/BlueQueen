@@ -41,6 +41,14 @@ public class Data {
     @Getter
     private final Map<String, String> userPassword = new HashMap<>();
 
+    @Getter
+    @Setter
+    private String admin;
+
+    @Getter
+    @Setter
+    private String mainPage;
+
     private Data() {
 
     }

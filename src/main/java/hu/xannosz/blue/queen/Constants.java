@@ -14,7 +14,15 @@ public class Constants {
     public static final String SETTINGS = "settings";
     public static final String SETTINGS_OK = "settingsOK";
 
-    public static final String PERSIST_FOLDER = "/persist";
+    public static final String PERSIST_FOLDER;
+
+    static {
+        if (OsUtils.isWindows()) {
+            PERSIST_FOLDER = "persist";
+        } else {
+            PERSIST_FOLDER = "/persist";
+        }
+    }
 
     public static final String ID = "id";
     public static final String IMAGE = "image";

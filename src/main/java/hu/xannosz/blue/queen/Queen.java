@@ -2,9 +2,9 @@ package hu.xannosz.blue.queen;
 
 import com.google.common.base.Strings;
 import hu.xannosz.microtools.pack.Douplet;
-import hu.xannosz.veneos.core.HttpHandler;
-import hu.xannosz.veneos.core.Page;
 import hu.xannosz.veneos.core.VeneosServer;
+import hu.xannosz.veneos.core.handler.HttpHandler;
+import hu.xannosz.veneos.core.html.structure.Page;
 
 import java.util.*;
 
@@ -76,20 +76,10 @@ public class Queen implements HttpHandler {
         if (containerId != null) {
             if (method.equals(STOP)) {
                 DockerHolder.stop(containerId);
-                for (Task task : Data.INSTANCE.getTasks()) {
-                    if (task.getId().equals(containerName)) {
-                        task.setShouldRunning(false);
-                    }
-                }
                 return PageCreator.redirectPage(dataMap);
             }
             if (method.equals(START)) {
                 DockerHolder.start(containerId);
-                for (Task task : Data.INSTANCE.getTasks()) {
-                    if (task.getId().equals(containerName)) {
-                        task.setShouldRunning(true);
-                    }
-                }
                 return PageCreator.redirectPage(dataMap);
             }
             if (method.equals(RESTART)) {
@@ -198,7 +188,7 @@ public class Queen implements HttpHandler {
         Task task = new Task();
         task.setId(map.get(ID).trim());
         task.setImage(map.get(IMAGE).trim());
-        task.setShouldRunning(Boolean.parseBoolean(map.get(SHOULD_RUN)));
+        task.setShouldRunning(Task.ShouldRunning.valueOf(map.get(SHOULD_RUN).trim()));
         for (int i = 0; i < map.size(); i++) {
             try {
                 int portH = Integer.parseInt(map.get(PORT + "H" + i).trim());

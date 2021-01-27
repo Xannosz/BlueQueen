@@ -3,15 +3,20 @@ package hu.xannosz.blue.queen;
 import com.google.gson.Gson;
 import com.spotify.docker.client.messages.Container;
 import hu.xannosz.microtools.pack.Douplet;
-import hu.xannosz.veneos.core.HtmlClass;
-import hu.xannosz.veneos.core.Page;
-import hu.xannosz.veneos.core.Theme;
-import hu.xannosz.veneos.core.ThemeHandler;
-import hu.xannosz.veneos.core.css.CssAttribute;
 import hu.xannosz.veneos.core.css.CssComponent;
-import hu.xannosz.veneos.core.css.HtmlSelector;
-import hu.xannosz.veneos.core.css.Selector;
-import hu.xannosz.veneos.core.html.*;
+import hu.xannosz.veneos.core.css.CssProperty;
+import hu.xannosz.veneos.core.css.Theme;
+import hu.xannosz.veneos.core.css.selector.HtmlSelector;
+import hu.xannosz.veneos.core.css.selector.PseudoClass;
+import hu.xannosz.veneos.core.html.HtmlClass;
+import hu.xannosz.veneos.core.html.HtmlComponent;
+import hu.xannosz.veneos.core.html.box.Div;
+import hu.xannosz.veneos.core.html.box.Footer;
+import hu.xannosz.veneos.core.html.form.*;
+import hu.xannosz.veneos.core.html.str.P;
+import hu.xannosz.veneos.core.html.str.Span;
+import hu.xannosz.veneos.core.html.str.StringModifiers;
+import hu.xannosz.veneos.core.html.structure.Page;
 import hu.xannosz.veneos.next.*;
 import org.json.JSONObject;
 
@@ -28,108 +33,102 @@ public class PageCreator {
     private static final Theme theme = new Theme();
     private static final HtmlClass oneButton = new HtmlClass();
     private static final HtmlClass delete = new HtmlClass();
-
     private static final HtmlClass containerName = new HtmlClass();
     private static final HtmlClass label = new HtmlClass();
-
     private static final HtmlClass running = new HtmlClass();
     private static final HtmlClass exited = new HtmlClass();
-
     private static final HtmlClass managed = new HtmlClass();
     private static final HtmlClass notManaged = new HtmlClass();
-
     private static final HtmlClass upButton = new HtmlClass();
 
     static {
         CssComponent pre = new CssComponent(HtmlSelector.PRE);
-        pre.addAttribute(CssAttribute.COLOR, "#268bd2");
-        pre.addAttribute(CssAttribute.PADDING, "2px");
-        pre.addAttribute(CssAttribute.MARGIN, "2%");
-        pre.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
+        pre.addProperty(CssProperty.COLOR, "#268bd2");
+        pre.addProperty(CssProperty.PADDING, "2px");
+        pre.addProperty(CssProperty.MARGIN, "2%");
+        pre.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
         theme.add(pre);
 
         CssComponent div = new CssComponent(HtmlSelector.DIV);
-        div.addAttribute(CssAttribute.COLOR, "#268bd2");
-        div.addAttribute(CssAttribute.PADDING, "10px 20px 15px 20px");
-        div.addAttribute(CssAttribute.MARGIN, "2%");
-        div.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
-        div.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
+        div.addProperty(CssProperty.COLOR, "#268bd2");
+        div.addProperty(CssProperty.PADDING, "10px 20px 15px 20px");
+        div.addProperty(CssProperty.MARGIN, "2%");
+        div.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        div.addProperty(CssProperty.BORDER_RADIUS, "25px");
         theme.add(div);
 
-        CssComponent oneBut = new CssComponent(new Selector(oneButton));
-        oneBut.addAttribute(CssAttribute.FLOAT, "left");
-        oneBut.addAttribute(CssAttribute.MARGIN, "2px");
+        CssComponent oneBut = new CssComponent(oneButton.getSelector());
+        oneBut.addProperty(CssProperty.FLOAT, "left");
+        oneBut.addProperty(CssProperty.MARGIN, "2px");
         theme.add(oneBut);
 
-        CssComponent oneButInline = new CssComponent(HtmlSelector.BUTTON.getSelector());
-        oneButInline.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
-        oneButInline.addAttribute(CssAttribute.COLOR, "#268bd2");
-        oneButInline.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
-        oneButInline.addAttribute(CssAttribute.BORDER_COLOR, "#002b36");
+        CssComponent oneButInline = new CssComponent(HtmlSelector.BUTTON);
+        oneButInline.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        oneButInline.addProperty(CssProperty.COLOR, "#268bd2");
+        oneButInline.addProperty(CssProperty.BORDER_RADIUS, "25px");
+        oneButInline.addProperty(CssProperty.BORDER_COLOR, "#002b36");
         theme.add(oneButInline);
 
-        CssComponent deleteComp = new CssComponent(new Selector(new Selector(delete).getSyntax() + " " + HtmlSelector.BUTTON));
-        deleteComp.addAttribute(CssAttribute.BACKGROUND_COLOR, "#dc322f");
+        CssComponent deleteComp = new CssComponent(delete.getSelector().descendant(HtmlSelector.BUTTON.getSelector()));
+        deleteComp.addProperty(CssProperty.BACKGROUND_COLOR, "#dc322f");
         theme.add(deleteComp);
 
-        CssComponent buttonHover = new CssComponent(new Selector(HtmlSelector.BUTTON.toString() + ":hover"));
-        buttonHover.addAttribute(CssAttribute.BACKGROUND_COLOR, "#002b36");
-        buttonHover.addAttribute(CssAttribute.BORDER_COLOR, "#073642");
+        CssComponent buttonHover = new CssComponent(HtmlSelector.BUTTON.getSelector().addPseudoClass(PseudoClass.HOVER));
+        buttonHover.addProperty(CssProperty.BACKGROUND_COLOR, "#002b36");
+        buttonHover.addProperty(CssProperty.BORDER_COLOR, "#073642");
         theme.add(buttonHover);
 
-        CssComponent buttonClicked = new CssComponent(new Selector(HtmlSelector.BUTTON.toString() + ":active"));
-        buttonClicked.addAttribute(CssAttribute.COLOR, "#6c71c4");
+        CssComponent buttonClicked = new CssComponent(HtmlSelector.BUTTON.getSelector().addPseudoClass(PseudoClass.ACTIVE));
+        buttonClicked.addProperty(CssProperty.COLOR, "#6c71c4");
         theme.add(buttonClicked);
 
-        CssComponent input = new CssComponent(HtmlSelector.INPUT.getSelector());
-        input.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
-        input.addAttribute(CssAttribute.COLOR, "#268bd2");
-        input.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
-        input.addAttribute(CssAttribute.BORDER_COLOR, "#002b36");
+        CssComponent input = new CssComponent(HtmlSelector.INPUT);
+        input.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        input.addProperty(CssProperty.COLOR, "#268bd2");
+        input.addProperty(CssProperty.BORDER_RADIUS, "25px");
+        input.addProperty(CssProperty.BORDER_COLOR, "#002b36");
         theme.add(input);
 
-        CssComponent notManagedComp = new CssComponent(new Selector(notManaged));
-        notManagedComp.addAttribute(CssAttribute.COLOR, "#dc322f");
+        CssComponent notManagedComp = new CssComponent(notManaged.getSelector());
+        notManagedComp.addProperty(CssProperty.COLOR, "#dc322f");
         theme.add(notManagedComp);
 
-        CssComponent managedComp = new CssComponent(new Selector(managed));
-        managedComp.addAttribute(CssAttribute.COLOR, "#859900");
+        CssComponent managedComp = new CssComponent(managed.getSelector());
+        managedComp.addProperty(CssProperty.COLOR, "#859900");
         theme.add(managedComp);
 
-        CssComponent containerNameComp = new CssComponent(new Selector(containerName));
-        containerNameComp.addAttribute(CssAttribute.FONT_WEIGHT, "bold");
+        CssComponent containerNameComp = new CssComponent(containerName.getSelector());
+        containerNameComp.addProperty(CssProperty.FONT_WEIGHT, "bold");
         theme.add(containerNameComp);
 
-        CssComponent labelComp = new CssComponent(new Selector(label));
-        labelComp.addAttribute(CssAttribute.COLOR, "#586e75");
-        labelComp.addAttribute(CssAttribute.FONT_STYLE, "italic");
+        CssComponent labelComp = new CssComponent(label.getSelector());
+        labelComp.addProperty(CssProperty.COLOR, "#586e75");
+        labelComp.addProperty(CssProperty.FONT_STYLE, "italic");
         theme.add(labelComp);
 
-        CssComponent runningComp = new CssComponent(new Selector(running));
-        runningComp.addAttribute(CssAttribute.COLOR, "#859900");
+        CssComponent runningComp = new CssComponent(running.getSelector());
+        runningComp.addProperty(CssProperty.COLOR, "#859900");
         theme.add(runningComp);
 
-        CssComponent exitedComp = new CssComponent(new Selector(exited));
-        exitedComp.addAttribute(CssAttribute.COLOR, "#dc322f");
+        CssComponent exitedComp = new CssComponent(exited.getSelector());
+        exitedComp.addProperty(CssProperty.COLOR, "#dc322f");
         theme.add(exitedComp);
 
-        CssComponent upButtonComp = new CssComponent(new Selector(upButton));
-        upButtonComp.addAttribute(CssAttribute.DISPLAY, "none");
+        CssComponent upButtonComp = new CssComponent(upButton.getSelector());
+        upButtonComp.addProperty(CssProperty.DISPLAY, "none");
         theme.add(upButtonComp);
 
         CssComponent body = new CssComponent(HtmlSelector.BODY);
-        body.addAttribute(CssAttribute.BACKGROUND_COLOR, "#002b36");
+        body.addProperty(CssProperty.BACKGROUND_COLOR, "#002b36");
         theme.add(body);
 
         CssComponent footer = new CssComponent(HtmlSelector.FOOTER);
-        footer.addAttribute(CssAttribute.COLOR, "#268bd2");
-        footer.addAttribute(CssAttribute.PADDING, "10px 20px 15px 20px");
-        footer.addAttribute(CssAttribute.MARGIN, "2%");
-        footer.addAttribute(CssAttribute.BACKGROUND_COLOR, "#073642");
-        footer.addAttribute(CssAttribute.BORDER_RADIUS, "25px");
+        footer.addProperty(CssProperty.COLOR, "#268bd2");
+        footer.addProperty(CssProperty.PADDING, "10px 20px 15px 20px");
+        footer.addProperty(CssProperty.MARGIN, "2%");
+        footer.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        footer.addProperty(CssProperty.BORDER_RADIUS, "25px");
         theme.add(footer);
-
-        ThemeHandler.registerTheme(theme);
     }
 
     public static Douplet<Integer, Page> createInspect(String containerId, String containerName, Map<String, String> dataMap) {
@@ -140,7 +139,7 @@ public class PageCreator {
         div.add(new JsonDisplay(new JSONObject(new Gson().toJson(DockerHolder.inspectContainer(containerId))), 3, page));
         page.addComponent(div);
         page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).setDatas(dataMap).addClass(upButton));
-        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
+        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"), false);
         fixedButton.setDatas(dataMap);
         page.addComponent(fixedButton);
         return new Douplet<>(200, page);
@@ -154,7 +153,7 @@ public class PageCreator {
         page.setTitle("Blue Queen | " + (newTask ? "New Task" : task.getId()));
         Div div = new Div();
 
-        Form form = new Form("/" + (newTask ? "new" : DockerHolder.getContainerIdFromName(task.getId())) + "/" + EDIT_FORM);
+        Form form = new Form("/" + (newTask ? "new" : DockerHolder.getContainerIdFromName(task.getId())) + "/" + EDIT_FORM, false);
         form.setDatas(dataMap);
 
         form.add(new Label(ID, " task id: ").addClass(label));
@@ -173,21 +172,23 @@ public class PageCreator {
         }
         form.add(image);
 
-        form.add(new Label(SHOULD_RUN, " should run (bool) : ").addClass(label));
-        Input run = new Input("text");
-        run.setName(SHOULD_RUN);
-        if (!newTask) {
-            run.setValue("" + task.isShouldRunning());
+        form.add(new Label(SHOULD_RUN, " should run: ").addClass(label));
+        Select runSelect = new Select(SHOULD_RUN);
+        for (Task.ShouldRunning value : Task.ShouldRunning.values()) {
+            runSelect.add(new Option(value.toString(), value.toString()));
+            if (!newTask && value == task.getShouldRunning()) {
+                runSelect.putMeta("selected", "selected");
+            }
         }
-        form.add(run);
+        form.add(runSelect);
 
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
 
         form.add(new Label("ports", "ports : ").addClass(label));
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
         form.add(new Label("ports", "host............|").addClass(label));
         form.add(new Label("ports", "|............docker").addClass(label));
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
         int p = 0; //portNumber
         if (!newTask) {
             for (Douplet<Integer, Integer> port : task.getPorts()) {
@@ -201,7 +202,7 @@ public class PageCreator {
                 inputD.setValue("" + port.getSecond());
                 form.add(inputD);
 
-                form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+                form.add(StringModifiers.BR.toString());
                 p++;
             }
         }
@@ -214,15 +215,15 @@ public class PageCreator {
             inputD.setName(PORT + "D" + p);
             form.add(inputD);
 
-            form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+            form.add(StringModifiers.BR.toString());
             p++;
         }
 
         form.add(new Label("volumes", "volumes : ").addClass(label));
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
         form.add(new Label("volumes", "host............|").addClass(label));
         form.add(new Label("volumes", "|............docker").addClass(label));
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
         int v = 0; //volumeNumber
         if (!newTask) {
             for (Douplet<String, String> port : task.getVolumes()) {
@@ -236,7 +237,7 @@ public class PageCreator {
                 inputD.setValue("" + port.getSecond());
                 form.add(inputD);
 
-                form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+                form.add(StringModifiers.BR.toString());
                 v++;
             }
         }
@@ -249,7 +250,7 @@ public class PageCreator {
             inputD.setName(VOLUME + "D" + v);
             form.add(inputD);
 
-            form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+            form.add(StringModifiers.BR.toString());
             v++;
         }
 
@@ -259,7 +260,7 @@ public class PageCreator {
 
         div.add(form);
 
-        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
+        div.add(new OneButtonForm("/", "Cancel", false).setDatas(dataMap).addClass(oneButton));
 
         page.addComponent(div);
 
@@ -278,7 +279,7 @@ public class PageCreator {
         }
         page.addComponent(div);
         page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).setDatas(dataMap).addClass(upButton));
-        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"));
+        FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"), false);
         fixedButton.setDatas(dataMap);
         page.addComponent(fixedButton);
         return new Douplet<>(200, page);
@@ -304,28 +305,28 @@ public class PageCreator {
             div.add(createInformationLine(getValidName(container, tasks), container.image()
                     , "" + container.state(), container.status(), isManaged));
             if ("running".equals(container.state())) {
-                div.add(new OneButtonForm("/" + container.id() + "/" + STOP, "Stop").setDatas(dataMap).addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + STOP, "Stop", false).setDatas(dataMap).addClass(oneButton));
             } else {
-                div.add(new OneButtonForm("/" + container.id() + "/" + START, "Start").setDatas(dataMap).addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + START, "Start", false).setDatas(dataMap).addClass(oneButton));
             }
-            div.add(new OneButtonForm("/" + container.id() + "/" + RESTART, "Restart").setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + RESTART, "Restart", false).setDatas(dataMap).addClass(oneButton));
             if (isManaged) {
-                div.add(new OneButtonForm("/" + container.id() + "/" + RE_PULL, "Re pull").setDatas(dataMap).addClass(oneButton));
-                div.add(new OneButtonForm("/" + container.id() + "/" + EDIT, "Edit").setDatas(dataMap).addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + RE_PULL, "Re pull", false).setDatas(dataMap).addClass(oneButton));
+                div.add(new OneButtonForm("/" + container.id() + "/" + EDIT, "Edit", false).setDatas(dataMap).addClass(oneButton));
             }
-            div.add(new OneButtonForm("/" + container.id() + "/" + LOGS, "Logs").setDatas(dataMap).addClass(oneButton));
-            div.add(new OneButtonForm("/" + container.id() + "/" + INSPECT, "Inspect").setDatas(dataMap).addClass(oneButton));
-            div.add(new OneButtonForm("/" + container.id() + "/" + DELETE, "Delete").setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + LOGS, "Logs", false).setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + INSPECT, "Inspect", false).setDatas(dataMap).addClass(oneButton));
+            div.add(new OneButtonForm("/" + container.id() + "/" + DELETE, "Delete", false).setDatas(dataMap).addClass(oneButton));
 
             page.addComponent(div);
         }
 
-        page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%")).setDatas(dataMap));
-        page.addComponent(new FixedButton("/"+SETTINGS, "Settings", new ButtonPosition("10%", "20%")).setDatas(dataMap));
+        page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%"), false).setDatas(dataMap));
+        page.addComponent(new FixedButton("/" + SETTINGS, "Settings", new ButtonPosition("10%", "20%"), false).setDatas(dataMap));
 
         page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
-        page.addComponent((new Footer()).add(new StringHtmlComponent("Restart date: " + reStartDate))
-                .add(new StringHtmlComponent(StringModifiers.BR + "Blue Queen version: " + Util.VERSION)));
+        page.addComponent((new Footer()).add("Restart date: " + reStartDate)
+                .add(StringModifiers.BR + "Blue Queen version: " + Util.VERSION));
 
         return new Douplet<>(200, page);
     }
@@ -370,8 +371,8 @@ public class PageCreator {
         page.setTitle("Blue Queen | " + containerName);
         Div div = new Div();
         div.add(new P("Delete " + containerName + " ?"));
-        div.add(new OneButtonForm("/" + containerId + "/" + DELETE_OK, "Delete").setDatas(dataMap).addClass(oneButton).addClass(delete));
-        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
+        div.add(new OneButtonForm("/" + containerId + "/" + DELETE_OK, "Delete", false).setDatas(dataMap).addClass(oneButton).addClass(delete));
+        div.add(new OneButtonForm("/", "Cancel", false).setDatas(dataMap).addClass(oneButton));
         page.addComponent(div);
         return new Douplet<>(200, page);
     }
@@ -382,7 +383,7 @@ public class PageCreator {
         page.setTitle("Blue Queen | Settings");
         Div div = new Div();
 
-        Form form = new Form("/" + SETTINGS_OK);
+        Form form = new Form("/" + SETTINGS_OK, false);
         form.setDatas(dataMap);
 
         form.add(new Label(NEXT_RESTART_DATE, " next restart date (date) : ").addClass(label));
@@ -403,7 +404,7 @@ public class PageCreator {
         checkingDelay.setValue("" + Data.INSTANCE.getCheckingDelay());
         form.add(checkingDelay);
 
-        form.add(new StringHtmlComponent(StringModifiers.BR.toString()));
+        form.add(StringModifiers.BR.toString());
 
         Button send = new Button("Ok");
         send.setSubmit();
@@ -411,7 +412,7 @@ public class PageCreator {
 
         div.add(form);
 
-        div.add(new OneButtonForm("/", "Cancel").setDatas(dataMap).addClass(oneButton));
+        div.add(new OneButtonForm("/", "Cancel", false).setDatas(dataMap).addClass(oneButton));
 
         page.addComponent(div);
 

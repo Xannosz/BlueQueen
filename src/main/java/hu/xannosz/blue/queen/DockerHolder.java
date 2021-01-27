@@ -20,8 +20,11 @@ public class DockerHolder {
     private static DockerClient docker;
 
     public static void init() {
-        docker = DefaultDockerClient.builder().uri("unix:///var/run/docker.sock").build();
-        //docker = DefaultDockerClient.builder().uri("http://localhost:2375").build();
+        if (OsUtils.isWindows()) {
+            docker = DefaultDockerClient.builder().uri("http://localhost:2375").build();
+        } else {
+            docker = DefaultDockerClient.builder().uri("unix:///var/run/docker.sock").build();
+        }
     }
 
     public static void startAllTasks(Set<Task> tasks) {
@@ -65,7 +68,7 @@ public class DockerHolder {
             final String id = creation.id();
 
             docker.renameContainer(id, task.getId().trim());
-            if (task.isShouldRunning()) {
+            if (task.getShouldRunning() != Task.ShouldRunning.ONCE) {
                 docker.startContainer(id);
             }
         } catch (Exception e) {

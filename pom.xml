@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hu.xannosz</groupId>
     <artifactId>blue.queen</artifactId>
-    <version>1.1.4</version>
+    <version>1.2.0</version>
     <name>blue.queen</name>
     <description>Docker manager</description>
     <organization>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>hu.xannosz</groupId>
             <artifactId>veneos</artifactId>
-            <version>0.2.5</version>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.spotify</groupId>

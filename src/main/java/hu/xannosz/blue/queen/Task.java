@@ -10,7 +10,7 @@ import java.util.Set;
 public class Task {
     private String id;
     private String image;
-    private boolean shouldRunning;
+    private ShouldRunning shouldRunning;
     private Set<Douplet<Integer, Integer>> ports = new HashSet<>();
     private Set<Douplet<String, String>> volumes = new HashSet<>();
 
@@ -20,5 +20,9 @@ public class Task {
 
     public void addVolume(String host, String docker) {
         volumes.add(new Douplet<>(host, docker));
+    }
+
+    public enum ShouldRunning {
+        TRUE,FALSE,ONCE
     }
 }

@@ -1,6 +1,6 @@
 package hu.xannosz.blue.queen;
 
-import hu.xannosz.veneos.core.LogHandler;
+import hu.xannosz.veneos.core.handler.LogHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -14,7 +14,7 @@ public class LogHandlerImpl implements LogHandler {
     public static final LogHandlerImpl INSTANCE = new LogHandlerImpl();
 
     @Getter
-    private List<Log> logs = new ArrayList<>();
+    private final List<Log> logs = new ArrayList<>();
 
     @Override
     public void log(LogLevel logLevel, String reason, String message) {
