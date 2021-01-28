@@ -18,7 +18,7 @@ public class Constants {
 
     static {
         if (OsUtils.isWindows()) {
-            PERSIST_FOLDER = "persist";
+            PERSIST_FOLDER = "C:/persist";
         } else {
             PERSIST_FOLDER = "/persist";
         }
