@@ -36,4 +36,5 @@ public class Constants {
     public static final String NEXT_RESTART_DATE = "nextRestartDate";
     public static final String TIME_TO_RESTART = "timeToRestart";
     public static final String CHECKING_DELAY = "checkingDelay";
+    public static final String MAIN_PAGE = "mainPage";
 }

@@ -43,6 +43,7 @@ public class Queen implements HttpHandler {
 
         if (user != null && password != null) {
             if (Data.INSTANCE.getUserPassword().isEmpty()) {
+                Data.INSTANCE.getEnabledUsers().add(user);
                 Data.INSTANCE.addUserPassword(user, password);
             }
             if (Data.INSTANCE.authenticate(user, password)) {
@@ -162,8 +163,9 @@ public class Queen implements HttpHandler {
         if (method.equals(SETTINGS_OK)) {
             try {
                 Data.INSTANCE.setCheckingDelay(Integer.parseInt(map.get(CHECKING_DELAY)));
-                Data.INSTANCE.setNextRestartDate(new Date(map.get(NEXT_RESTART_DATE)));
+                Data.INSTANCE.setNextRestartDate(new Date(map.get(NEXT_RESTART_DATE).trim()));
                 Data.INSTANCE.setTimeToRestart(Integer.parseInt(map.get(TIME_TO_RESTART)));
+                Data.INSTANCE.setMainPage(map.get(MAIN_PAGE).trim());
                 Data.writeData();
             } catch (Exception e) {
                 //No problem

@@ -18,6 +18,7 @@ import hu.xannosz.veneos.core.html.str.Span;
 import hu.xannosz.veneos.core.html.str.StringModifiers;
 import hu.xannosz.veneos.core.html.structure.Page;
 import hu.xannosz.veneos.next.*;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -25,8 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static hu.xannosz.blue.queen.Constants.*;
-import static hu.xannosz.blue.queen.DockerHolder.getValidName;
-import static hu.xannosz.blue.queen.DockerHolder.isManaged;
+import static hu.xannosz.blue.queen.DockerHolder.*;
 
 public class PageCreator {
 
@@ -175,9 +175,10 @@ public class PageCreator {
         form.add(new Label(SHOULD_RUN, " should run: ").addClass(label));
         Select runSelect = new Select(SHOULD_RUN);
         for (Task.ShouldRunning value : Task.ShouldRunning.values()) {
-            runSelect.add(new Option(value.toString(), value.toString()));
+            Option option = new Option(value.toString(), value.toString());
+            runSelect.add(option);
             if (!newTask && value == task.getShouldRunning()) {
-                runSelect.putMeta("selected", "selected");
+                option.putMeta("selected", "selected");
             }
         }
         form.add(runSelect);
@@ -303,7 +304,7 @@ public class PageCreator {
             boolean isManaged = isManaged(container, tasks);
 
             div.add(createInformationLine(getValidName(container, tasks), container.image()
-                    , "" + container.state(), container.status(), isManaged));
+                    , "" + container.state(), container.status(), isManaged, getShouldRun(container, tasks)));
             if ("running".equals(container.state())) {
                 div.add(new OneButtonForm("/" + container.id() + "/" + STOP, "Stop", false).setDatas(dataMap).addClass(oneButton));
             } else {
@@ -323,6 +324,9 @@ public class PageCreator {
 
         page.addComponent(new FixedButton("/new/edit", "Add new docker", new ButtonPosition("10%", "10%"), false).setDatas(dataMap));
         page.addComponent(new FixedButton("/" + SETTINGS, "Settings", new ButtonPosition("10%", "20%"), false).setDatas(dataMap));
+        if (Data.INSTANCE.getMainPage() != null && StringUtils.isNotEmpty(Data.INSTANCE.getMainPage())) {
+            page.addComponent(new FixedButton(Data.INSTANCE.getMainPage(), "Back", new ButtonPosition("10%", "30%"), false));
+        }
 
         page.addComponent(new Redirect("/", 5000, page).setDatas(dataMap));
         page.addComponent((new Footer()).add("Restart date: " + reStartDate)
@@ -338,7 +342,7 @@ public class PageCreator {
         return new Douplet<>(200, page);
     }
 
-    private static HtmlComponent createInformationLine(String validName, String image, String state, String status, boolean isManaged) {
+    private static HtmlComponent createInformationLine(String validName, String image, String state, String status, boolean isManaged, Task.ShouldRunning shouldRunning) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(new Span(validName).addClass(containerName).getSyntax()).append(StringModifiers.BR);
@@ -361,6 +365,15 @@ public class PageCreator {
             builder.append(" ").append(new Span("MANAGED").addClass(managed).getSyntax());
         } else {
             builder.append(" ").append(new Span("NOT MANAGED").addClass(notManaged).getSyntax());
+        }
+
+        builder.append(" ").append(new Span("should run:").addClass(label).getSyntax());
+        if (shouldRunning == Task.ShouldRunning.TRUE) {
+            builder.append(" ").append(new Span("TRUE").addClass(managed).getSyntax());
+        } else if (shouldRunning == Task.ShouldRunning.FALSE) {
+            builder.append(" ").append(new Span("FALSE").addClass(notManaged).getSyntax());
+        } else if (shouldRunning == Task.ShouldRunning.ONCE) {
+            builder.append(" ").append(new Span("ONCE").getSyntax());
         }
         return new P(builder.toString());
     }
@@ -392,6 +405,8 @@ public class PageCreator {
         nextRestartDate.setValue("" + Data.INSTANCE.getNextRestartDate());
         form.add(nextRestartDate);
 
+        form.add(StringModifiers.BR.toString());
+
         form.add(new Label(TIME_TO_RESTART, " time to restart (integer) : ").addClass(label));
         Input timeToRestart = new Input("text");
         timeToRestart.setName(TIME_TO_RESTART);
@@ -403,6 +418,14 @@ public class PageCreator {
         checkingDelay.setName(CHECKING_DELAY);
         checkingDelay.setValue("" + Data.INSTANCE.getCheckingDelay());
         form.add(checkingDelay);
+
+        form.add(StringModifiers.BR.toString());
+
+        form.add(new Label(MAIN_PAGE, " main page: ").addClass(label));
+        Input mainPage = new Input("text");
+        mainPage.setName(MAIN_PAGE);
+        mainPage.setValue("" + Data.INSTANCE.getMainPage());
+        form.add(mainPage);
 
         form.add(StringModifiers.BR.toString());
 

@@ -68,7 +68,7 @@ public class DockerHolder {
             final String id = creation.id();
 
             docker.renameContainer(id, task.getId().trim());
-            if (task.getShouldRunning() != Task.ShouldRunning.ONCE) {
+            if (task.getShouldRunning() != Task.ShouldRunning.FALSE) {
                 docker.startContainer(id);
             }
         } catch (Exception e) {
@@ -135,7 +135,7 @@ public class DockerHolder {
     public static void reStart(String id) {
         try {
             docker.restartContainer(id, 1);
-        } catch (DockerException | InterruptedException e) {
+        } catch (Exception e) {
             LogHandlerImpl.INSTANCE.error(String.format("Restart container %s failed.", id), e);
         }
     }
@@ -177,6 +177,21 @@ public class DockerHolder {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static void checkAllTasks(Set<Task> tasks) {
+        for (Task task : tasks) {
+            try {
+                final String running = getContainerIdFromName(task.getId());
+                if (running != null && task.getShouldRunning() == Task.ShouldRunning.TRUE
+                        && !getContainerFromId(running).state().equals("running")) {
+                    reStart(running);
+                }
+            } catch (Exception e) {
+                LogHandlerImpl.INSTANCE.error(String.format("Restart %s task failed.", task.getId()), e);
+            }
+        }
+    }
+
     public static String getValidName(String container, Set<Task> tasks) {
         Container cont = getContainerFromId(container);
         if (cont == null) {
@@ -200,6 +215,20 @@ public class DockerHolder {
             return Objects.requireNonNull(container.names()).get(0).substring(1);
         }
         return container.id();
+    }
+
+    public static Task.ShouldRunning getShouldRun(Container container, Set<Task> tasks) {
+        if (container.names() == null) {
+            return null;
+        }
+        for (String cnt : Objects.requireNonNull(container.names())) {
+            for (Task task : tasks) {
+                if (("/" + task.getId()).equals(cnt)) {
+                    return task.getShouldRunning();
+                }
+            }
+        }
+        return null;
     }
 
     public static Container getContainerFromId(String container) {

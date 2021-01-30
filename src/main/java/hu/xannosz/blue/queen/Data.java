@@ -42,8 +42,7 @@ public class Data {
     private final Map<String, String> userPassword = new HashMap<>();
 
     @Getter
-    @Setter
-    private String admin;
+    private final Set<String> enabledUsers = new HashSet<>();
 
     @Getter
     @Setter
@@ -63,6 +62,9 @@ public class Data {
     }
 
     public boolean authenticate(String user, String password) {
+        if(enabledUsers.contains(user)&&!userPassword.containsKey(user)){
+            addUserPassword(user,password);
+        }
         try {
             return Password.check(password, userPassword.get(user));
         } catch (Exception e) {

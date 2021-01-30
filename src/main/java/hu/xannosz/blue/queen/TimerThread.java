@@ -11,6 +11,7 @@ public class TimerThread extends Thread {
         Sleep.sleepSeconds(30);
         while (Data.INSTANCE.getNextRestartDate().after(new Date())) {
             Sleep.sleepMillis(Data.INSTANCE.getCheckingDelay());
+            DockerHolder.checkAllTasks(Data.INSTANCE.getTasks());
         }
         reStart();
     }
