@@ -224,6 +224,6 @@ public class Queen implements HttpHandler {
     }
 
     public static void main(String[] args) {
-        Queen queen = new Queen();
+        new Queen();
     }
 }

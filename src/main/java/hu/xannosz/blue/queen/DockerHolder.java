@@ -6,10 +6,10 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
 import hu.xannosz.microtools.pack.Douplet;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -96,11 +96,21 @@ public class DockerHolder {
 
     public static String getContainerLog(String containerId) {
         try {
-            File file = new File(docker.inspectContainer(containerId).logPath());
-            if (file.exists() && file.isFile()) {
-                return FileUtils.readFileToString(file);
+            String path = docker.inspectContainer(containerId).logPath();
+            if (OsUtils.isWindows()) {
+                path = path.replace("/var/lib/docker/containers", "\\\\wsl$\\docker-desktop-data\\version-pack-data\\community\\docker\\containers").replace("/", "\\");
             }
-            return docker.inspectContainer(containerId).logPath();
+
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
+                StringJoiner joiner = new StringJoiner(",");
+                for (String line : Files.readAllLines(file.toPath())) {
+                    joiner.add(line);
+                }
+                return "{\"logs\":[" + joiner + "]}";
+            }
+
+            return path;
         } catch (InterruptedException | DockerException | IOException e) {
             LogHandlerImpl.INSTANCE.error(String.format("Inspect container %s failed.", containerId), e);
         }

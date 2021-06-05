@@ -7,6 +7,7 @@ import hu.xannosz.veneos.core.css.CssComponent;
 import hu.xannosz.veneos.core.css.CssProperty;
 import hu.xannosz.veneos.core.css.Theme;
 import hu.xannosz.veneos.core.css.selector.HtmlSelector;
+import hu.xannosz.veneos.core.css.selector.ParameterizedPseudoClass;
 import hu.xannosz.veneos.core.css.selector.PseudoClass;
 import hu.xannosz.veneos.core.html.HtmlClass;
 import hu.xannosz.veneos.core.html.HtmlComponent;
@@ -17,10 +18,12 @@ import hu.xannosz.veneos.core.html.str.P;
 import hu.xannosz.veneos.core.html.str.Span;
 import hu.xannosz.veneos.core.html.str.StringModifiers;
 import hu.xannosz.veneos.core.html.structure.Page;
+import hu.xannosz.veneos.core.html.table.Table;
 import hu.xannosz.veneos.next.*;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -40,20 +43,29 @@ public class PageCreator {
     private static final HtmlClass managed = new HtmlClass();
     private static final HtmlClass notManaged = new HtmlClass();
     private static final HtmlClass upButton = new HtmlClass();
+    private static final HtmlClass copyJsonButton = new HtmlClass();
+
+    public static final String BODY_BACKGROUND_COLOR = "#002b36";
+    public static final String DIV_BACKGROUND_COLOR = "#073642";
+    public static final String NORMAL_TEXT_COLOR = "#268bd2";
+    public static final String RED = "#dc322f";
+    public static final String GREEN = "#859900";
+    public static final String GRAY = "#586e75";
+    public static final String BUTTON_CLICKED_COLOR = "#6c71c4";
 
     static {
         CssComponent pre = new CssComponent(HtmlSelector.PRE);
-        pre.addProperty(CssProperty.COLOR, "#268bd2");
+        pre.addProperty(CssProperty.COLOR, NORMAL_TEXT_COLOR);
         pre.addProperty(CssProperty.PADDING, "2px");
         pre.addProperty(CssProperty.MARGIN, "2%");
-        pre.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        pre.addProperty(CssProperty.BACKGROUND_COLOR, DIV_BACKGROUND_COLOR);
         theme.add(pre);
 
         CssComponent div = new CssComponent(HtmlSelector.DIV);
-        div.addProperty(CssProperty.COLOR, "#268bd2");
+        div.addProperty(CssProperty.COLOR, NORMAL_TEXT_COLOR);
         div.addProperty(CssProperty.PADDING, "10px 20px 15px 20px");
         div.addProperty(CssProperty.MARGIN, "2%");
-        div.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        div.addProperty(CssProperty.BACKGROUND_COLOR, DIV_BACKGROUND_COLOR);
         div.addProperty(CssProperty.BORDER_RADIUS, "25px");
         theme.add(div);
 
@@ -63,38 +75,38 @@ public class PageCreator {
         theme.add(oneBut);
 
         CssComponent oneButInline = new CssComponent(HtmlSelector.BUTTON);
-        oneButInline.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
-        oneButInline.addProperty(CssProperty.COLOR, "#268bd2");
+        oneButInline.addProperty(CssProperty.BACKGROUND_COLOR, DIV_BACKGROUND_COLOR);
+        oneButInline.addProperty(CssProperty.COLOR, NORMAL_TEXT_COLOR);
         oneButInline.addProperty(CssProperty.BORDER_RADIUS, "25px");
-        oneButInline.addProperty(CssProperty.BORDER_COLOR, "#002b36");
+        oneButInline.addProperty(CssProperty.BORDER_COLOR, BODY_BACKGROUND_COLOR);
         theme.add(oneButInline);
 
         CssComponent deleteComp = new CssComponent(delete.getSelector().descendant(HtmlSelector.BUTTON.getSelector()));
-        deleteComp.addProperty(CssProperty.BACKGROUND_COLOR, "#dc322f");
+        deleteComp.addProperty(CssProperty.BACKGROUND_COLOR, RED);
         theme.add(deleteComp);
 
         CssComponent buttonHover = new CssComponent(HtmlSelector.BUTTON.getSelector().addPseudoClass(PseudoClass.HOVER));
-        buttonHover.addProperty(CssProperty.BACKGROUND_COLOR, "#002b36");
-        buttonHover.addProperty(CssProperty.BORDER_COLOR, "#073642");
+        buttonHover.addProperty(CssProperty.BACKGROUND_COLOR, BODY_BACKGROUND_COLOR);
+        buttonHover.addProperty(CssProperty.BORDER_COLOR, DIV_BACKGROUND_COLOR);
         theme.add(buttonHover);
 
         CssComponent buttonClicked = new CssComponent(HtmlSelector.BUTTON.getSelector().addPseudoClass(PseudoClass.ACTIVE));
-        buttonClicked.addProperty(CssProperty.COLOR, "#6c71c4");
+        buttonClicked.addProperty(CssProperty.COLOR, BUTTON_CLICKED_COLOR);
         theme.add(buttonClicked);
 
         CssComponent input = new CssComponent(HtmlSelector.INPUT);
-        input.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
-        input.addProperty(CssProperty.COLOR, "#268bd2");
+        input.addProperty(CssProperty.BACKGROUND_COLOR, DIV_BACKGROUND_COLOR);
+        input.addProperty(CssProperty.COLOR, NORMAL_TEXT_COLOR);
         input.addProperty(CssProperty.BORDER_RADIUS, "25px");
-        input.addProperty(CssProperty.BORDER_COLOR, "#002b36");
+        input.addProperty(CssProperty.BORDER_COLOR, BODY_BACKGROUND_COLOR);
         theme.add(input);
 
         CssComponent notManagedComp = new CssComponent(notManaged.getSelector());
-        notManagedComp.addProperty(CssProperty.COLOR, "#dc322f");
+        notManagedComp.addProperty(CssProperty.COLOR, RED);
         theme.add(notManagedComp);
 
         CssComponent managedComp = new CssComponent(managed.getSelector());
-        managedComp.addProperty(CssProperty.COLOR, "#859900");
+        managedComp.addProperty(CssProperty.COLOR, GREEN);
         theme.add(managedComp);
 
         CssComponent containerNameComp = new CssComponent(containerName.getSelector());
@@ -102,31 +114,56 @@ public class PageCreator {
         theme.add(containerNameComp);
 
         CssComponent labelComp = new CssComponent(label.getSelector());
-        labelComp.addProperty(CssProperty.COLOR, "#586e75");
+        labelComp.addProperty(CssProperty.COLOR, GRAY);
         labelComp.addProperty(CssProperty.FONT_STYLE, "italic");
         theme.add(labelComp);
 
         CssComponent runningComp = new CssComponent(running.getSelector());
-        runningComp.addProperty(CssProperty.COLOR, "#859900");
+        runningComp.addProperty(CssProperty.COLOR, GREEN);
         theme.add(runningComp);
 
         CssComponent exitedComp = new CssComponent(exited.getSelector());
-        exitedComp.addProperty(CssProperty.COLOR, "#dc322f");
+        exitedComp.addProperty(CssProperty.COLOR, RED);
         theme.add(exitedComp);
 
         CssComponent upButtonComp = new CssComponent(upButton.getSelector());
         upButtonComp.addProperty(CssProperty.DISPLAY, "none");
         theme.add(upButtonComp);
 
+        CssComponent copyJsonButtonComp = new CssComponent(copyJsonButton.getSelector());
+        copyJsonButtonComp.addProperty(CssProperty.MARGIN, "3%");
+        theme.add(copyJsonButtonComp);
+
+        CssComponent th = new CssComponent(HtmlSelector.TH.getSelector());
+        th.addProperty(CssProperty.TEXT_DECORATION, "underline");
+        th.addProperty(CssProperty.PADDING, "8px");
+        theme.add(th);
+
+        CssComponent td = new CssComponent(HtmlSelector.TD.getSelector());
+        td.addProperty(CssProperty.PADDING, "8px");
+        theme.add(td);
+
+        CssComponent tdFirst = new CssComponent(HtmlSelector.TD.getSelector().addPseudoClass(PseudoClass.FIRST_CHILD));
+        tdFirst.addProperty(CssProperty.BORDER_RADIUS, "25px 0px 0px 25px");
+        theme.add(tdFirst);
+
+        CssComponent tdLast = new CssComponent(HtmlSelector.TD.getSelector().addPseudoClass(PseudoClass.LAST_CHILD));
+        tdLast.addProperty(CssProperty.BORDER_RADIUS, "0px 25px 25px 0px");
+        theme.add(tdLast);
+
+        CssComponent tr = new CssComponent(HtmlSelector.TR.getSelector().addPseudoClass(ParameterizedPseudoClass.NTH_CHILD, "even"));
+        tr.addProperty(CssProperty.BACKGROUND_COLOR, BODY_BACKGROUND_COLOR);
+        theme.add(tr);
+
         CssComponent body = new CssComponent(HtmlSelector.BODY);
-        body.addProperty(CssProperty.BACKGROUND_COLOR, "#002b36");
+        body.addProperty(CssProperty.BACKGROUND_COLOR, BODY_BACKGROUND_COLOR);
         theme.add(body);
 
         CssComponent footer = new CssComponent(HtmlSelector.FOOTER);
-        footer.addProperty(CssProperty.COLOR, "#268bd2");
+        footer.addProperty(CssProperty.COLOR, NORMAL_TEXT_COLOR);
         footer.addProperty(CssProperty.PADDING, "10px 20px 15px 20px");
         footer.addProperty(CssProperty.MARGIN, "2%");
-        footer.addProperty(CssProperty.BACKGROUND_COLOR, "#073642");
+        footer.addProperty(CssProperty.BACKGROUND_COLOR, DIV_BACKGROUND_COLOR);
         footer.addProperty(CssProperty.BORDER_RADIUS, "25px");
         theme.add(footer);
     }
@@ -273,11 +310,24 @@ public class PageCreator {
         page.addTheme(theme);
         page.setTitle("Blue Queen | " + containerName);
         Div div = new Div();
+
+        String log = DockerHolder.getContainerLog(containerId);
+        page.addComponent(new CopyButton("Get logs in json", page, log).addClass(copyJsonButton));
         try {
-            div.add(new JsonDisplay(new JSONObject(DockerHolder.getContainerLog(containerId)), 3, page));
+            ContainerLog containerLog = new Gson().fromJson(log, ContainerLog.class);
+            Collections.reverse(containerLog.getLogs());
+
+            Table table = new Table();
+            table.addHeadCell("Time").addHeadCell("Stream").addHeadCell("Log");
+            for (ContainerLog.LogLine line : containerLog.getLogs()) {
+                table.addCell(line.getTime()).addCell(line.getStream()).addCell(line.getLog()).newRow();
+            }
+
+            div.add(table);
         } catch (Exception e) {
-            div.add(new P(DockerHolder.getContainerLog(containerId)));
+            div.add(new P(log));
         }
+
         page.addComponent(div);
         page.addComponent(new ScrollUpButton("Top", new ButtonPosition("10%", "10%"), page).setDatas(dataMap).addClass(upButton));
         FixedButton fixedButton = new FixedButton("/", "Cancel", new ButtonPosition("10%", "20%"), false);
